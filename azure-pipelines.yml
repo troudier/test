@@ -78,7 +78,7 @@ stages:
       displayName: execute tests
       
   - job: Getmetrics
-    container: jakzal/phpqa
+    container: jakzal/phpqa:latest
     steps:
     - task: Cache@2
       inputs:
