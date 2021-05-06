@@ -4,12 +4,18 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+  branches:
+    include:
+    - master
+    - develop
+    - releases/*
+    - feature/*
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
+
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
