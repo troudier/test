@@ -79,12 +79,6 @@ stages:
     - script: composer require --dev phpunit/phpunit symfony/test-pack
       displayName: install phpUnit
     
-    - script: php ./vendor/bin/phpunit --migrate-configuration
-      displayName: migrate configuration
-      
-    - script: cat phpunit.xml.dist
-      displayName: show configuration
-    
     - script: php ./vendor/bin/phpunit
       displayName: execute tests
       
