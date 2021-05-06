@@ -105,7 +105,7 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpmd
+    - script: phpmd src xml phpmd.xml 
       displayName: phpmd
       
   - job: Phpcs
@@ -131,8 +131,8 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpcs
-      displayName: phpcs src
+    - script: phpcs src
+      displayName: phpcs 
       
       
 - stage: A
