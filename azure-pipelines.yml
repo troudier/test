@@ -10,16 +10,30 @@ trigger:
     - develop
     - releases/*
     - feature/*
+    
+    
+    
+stages:
+- stage: A
+  jobs:
+  - job: A1
+    steps:
 
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+  - job: A2
+
+- stage: B
+  jobs:
+  - job: B1
+  - job: B2
 pool:
   vmImage: ubuntu-latest
 
-steps:
 
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
