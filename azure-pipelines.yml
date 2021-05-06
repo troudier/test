@@ -161,7 +161,7 @@ stages:
     - script: phpcs src
       displayName: phpcs 
       
-  - job: Php-cs-fixer
+  - job: Php_cs_fixer
     container: jakzal/phpqa:latest
     steps:
     - task: Cache@2
