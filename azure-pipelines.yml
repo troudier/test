@@ -19,7 +19,7 @@ pool:
 stages:
 - stage: Prepare
   jobs:
-  - job: "Composer Install"
+  - job: "Composer_Install"
     steps:
       - script: composer install
         displayName: install composer dependencies
