@@ -132,7 +132,7 @@ stages:
      
       
     - script: phpcs
-      displayName: phpcs 
+      displayName: phpcs src
       
       
 - stage: A
