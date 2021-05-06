@@ -52,6 +52,8 @@ stages:
   
     
   - job: PhpUnit
+    env: 
+      XDEBUG_MODE: coverage
     steps:
     - task: Cache@2
       inputs:
@@ -74,7 +76,30 @@ stages:
       
     - script: php ./vendor/bin/phpunit
       displayName: execute tests
-  
+      
+  - job: Get metrics
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'composer | "$(Agent.OS)" | composer.lock'
+        restoreKeys: |
+          composer | "$(Agent.OS)"
+          composer
+        path: $(COMPOSER_CACHE_DIR)
+      displayName: Cache composer
+      
+    - task: Cache@2
+      inputs:
+        key: 'vendor '
+#          restoreKeys: 'vendor | vendor/**'
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
+      
+    - script: composer require --dev phpunit/phpunit symfony/test-pack
+      displayName: install phpUnit
+      
+    - script: php ./vendor/bin/phpunit
+      displayName: execute tests
 - stage: A
   dependsOn: Prepare
   jobs:
