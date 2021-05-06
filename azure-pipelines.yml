@@ -78,8 +78,7 @@ stages:
       displayName: execute tests
       
   - job: Getmetrics
-    pool:
-      vmImage: jakzal/phpqa
+    container: jakzal/phpqa
     steps:
     - task: Cache@2
       inputs:
