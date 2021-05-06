@@ -36,10 +36,8 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | vendor'
-          restoreKeys: |
-            symfony_vendor | "$(Agent.OS)"
-            symfony_vendor
+          key: 'vendor'
+          restoreKeys: vendor 
           path: $(SYMFONY_VENDOR_DIR)
           
         displayName: Cache vendors
