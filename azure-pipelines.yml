@@ -41,7 +41,7 @@ stages:
   jobs:
   - deployment: deployProd     
     pool:
-  vmImage: ubuntu-latest
+      vmImage: ubuntu-latest
     environment: prod
     strategy:
       runOnce:
