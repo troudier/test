@@ -1,7 +1,7 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+
 
 trigger:
   branches:
@@ -16,7 +16,7 @@ pool:
     
     
 stages:
-- stage: Install
+- stage: Prepare
   jobs:
   - job: Composer 
     steps:
@@ -47,6 +47,7 @@ stages:
 - stage: deployment
   jobs:
   - deployment: deployProd     
+    condition: eq(variables.isMain, true)
     pool:
       vmImage: ubuntu-latest
     environment: prod
