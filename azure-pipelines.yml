@@ -20,32 +20,35 @@ pool:
 stages:
 - stage: Prepare
   jobs:
-  - task: Cache@2
-    inputs:
-      key: 'composer | "$(Agent.OS)" | composer.lock'
-      restoreKeys: |
-        composer | "$(Agent.OS)"
-        composer
-      path: $(COMPOSER_CACHE_DIR)
+  
     displayName: Cache composer
   - job: "Composer_Install"
     steps:
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
       - script: composer install
         displayName: install composer dependencies
         
 - stage: Test
   jobs:
-  - task: Cache@2
-    inputs:
-      key: 'composer | "$(Agent.OS)" | composer.lock'
-      restoreKeys: |
-        composer | "$(Agent.OS)"
-        composer
-      path: $(COMPOSER_CACHE_DIR)
-    displayName: Cache composer
+  
     
   - job: PhpUnit
     steps:
+    - task: Cache@2
+      inputs:
+        key: 'composer | "$(Agent.OS)" | composer.lock'
+        restoreKeys: |
+          composer | "$(Agent.OS)"
+          composer
+        path: $(COMPOSER_CACHE_DIR)
+      displayName: Cache composer
+      
     - script: php bin/console test:run
   
 - stage: A
