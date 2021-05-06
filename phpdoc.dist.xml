@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpdoc>
-    <parser>
-        <target>documentation/phpdoc</target>
-        <encoding>utf8</encoding>
-          <markers>
-            <item>TODO</item>
-            <item>FIXME</item>
-          </markers>
-          <extensions>
-                <extension>php</extension>
-          </extensions>
-    </parser>
-    <transformer>
-        <target>documentation/phpdoc</target>
-    </transformer>
-    <files>
-        <directory>src</directory>
-        <ignore>test/*</ignore>
-        <ignore>var/*</ignore>
-    </files>
-</phpdoc>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+        xsi:noNamespaceSchemaLocation="https://docs.phpdoc.org/latest/phpdoc.xsd"
+>
+    <paths>
+        <output>build/api</output>
+        <cache>build/cache</cache>
+    </paths>
+    <version number="3.0.0">
+        <api>
+            <source dsn=".">
+                <path>src</path>
+            </source>
+        </api>
+    </version>
+</phpdocumentor>
