@@ -131,7 +131,7 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phploc src 
+    - script: phploc src tests --log-xml=phploc.xml --count-tests 
       displayName: phploc   
       
       
