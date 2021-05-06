@@ -38,13 +38,15 @@ stages:
   - job: B2
 
 - stage: deployment
+  jobs:
   - deployment: deployProd     
     pool:
-      name: string
-      demands: string | [ string ]
+  vmImage: ubuntu-latest
     environment: prod
     strategy:
       runOnce:
         deploy:
           steps:
           - script: echo Hi!
+          
+          
