@@ -1,7 +1,7 @@
 
 variables:
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
-  SYMFONY_VENDOR_DIR: $ (System.DefaultWorkingDirectory)/vendor
+  SYMFONY_VENDOR_DIR: $(Build.SourcesDirectory)/vendor
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
