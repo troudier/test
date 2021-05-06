@@ -99,6 +99,7 @@ stages:
       
     - task: Cache@2
       inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
         restoreKeys: |
           vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)"
