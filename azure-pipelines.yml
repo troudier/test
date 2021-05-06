@@ -1,6 +1,7 @@
 
 variables:
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
+  SYMFONY_VENDOR_DIR: $(Pipeline.Workspace)/vendor
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
@@ -22,7 +23,7 @@ stages:
   jobs:
   
     
-  - job: "Composer_Install"
+  - job: "ComposerInstall"
     steps:
       - task: Cache@2
         inputs:
@@ -32,6 +33,15 @@ stages:
             composer
           path: $(COMPOSER_CACHE_DIR)
         displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'symfony_vendor | "$(Agent.OS)" | vendor'
+          restoreKeys: |
+            symfony_vendor | "$(Agent.OS)"
+            symfony_vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
           
       - script: composer install
         displayName: install composer dependencies
