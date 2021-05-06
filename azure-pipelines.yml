@@ -71,10 +71,11 @@ stages:
       
     - script: composer require --dev phpunit/phpunit symfony/test-pack
       displayName: install phpUnit
-      
+    
+    - script: php ./vendor/bin/phpunit --migrate-configuration
+      displayName: migrate configuration
+    
     - script: php ./vendor/bin/phpunit
-      env: 
-        XDEBUG_MODE: coverage
       displayName: execute tests
       
   - job: Getmetrics
