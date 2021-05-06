@@ -25,7 +25,7 @@ stages:
     
   - job: "ComposerInstall"
     steps:
-      - script: ls -l $(Pipeline.Workspace)
+      - script: ls -l $(Build.SourcesDirectory)
         displayName: show workspace dir content 
     
       - task: Cache@2
