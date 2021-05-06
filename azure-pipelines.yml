@@ -49,12 +49,24 @@ stages:
 
 - stage: deployment
   dependsOn: [A, B]
+  condition: eq(variables.hasDeploy, true)
   jobs:
   - deployment: deployProd     
     condition: eq(variables.isMain, true)
     pool:
       vmImage: ubuntu-latest
     environment: prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo Hi!
+          
+  - deployment: deployProd     
+    condition: eq(variables.isMain, false)
+    pool:
+      vmImage: ubuntu-latest
+    environment: test
     strategy:
       runOnce:
         deploy:
