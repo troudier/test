@@ -38,7 +38,7 @@ stages:
   - job: B2
 
 - stage: deployment
-  - deployment: deploy-prod        # instead of job keyword, use deployment keyword
+  - deployment: deployProd     
     pool:
       name: string
       demands: string | [ string ]
