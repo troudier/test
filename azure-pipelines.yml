@@ -265,6 +265,6 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpDocumentor
+    - script: phpdoc
       displayName: phpDocumentor  
   
