@@ -36,11 +36,12 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'symfony_vendors | "$(Agent.OS)" | vendors'
+          key: 'vendor | "$(Agent.OS)" | vendor'
           restoreKeys: |
-            symfony_vendors | "$(Agent.OS)"
-            symfony_vendors
+            symfony_vendor | "$(Agent.OS)"
+            symfony_vendor
           path: $(SYMFONY_VENDOR_DIR)
+          
         displayName: Cache vendors
           
       - script: composer install
