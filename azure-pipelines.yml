@@ -69,7 +69,11 @@ stages:
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
       
-    - script: php bin/console test:run
+    - script: composer require --dev phpunit/phpunit symfony/test-pack
+      displayName: install phpUnit
+      
+    - script: php ./vendor/bin/phpunit
+      displayName: execute tests
   
 - stage: A
   dependsOn: Prepare
