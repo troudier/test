@@ -39,8 +39,9 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
           restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
             vendor
 #          restoreKeys: 'vendor | vendor/**'
@@ -67,11 +68,11 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor | "$(Agent.OS)"'
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
         restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)"
           vendor
-#          restoreKeys: 'vendor | vendor/**'
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
       
@@ -98,19 +99,16 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor | "$(Agent.OS)"'
         restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)"
           vendor
-#          restoreKeys: 'vendor | vendor/**'
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
+     
       
-    - script: composer require --dev phpunit/phpunit symfony/test-pack
-      displayName: install phpUnit
-      
-    - script: php ./vendor/bin/phpunit
-      displayName: execute tests
+    - script: phpmd
+      displayName: phpmd
 - stage: A
   dependsOn: Prepare
   jobs:
