@@ -23,6 +23,12 @@ stages:
     steps:
       - script: composer install
         displayName: install composer dependencies
+        
+- stage: Test
+  jobs:
+  - job: PhpUnit
+    steps:
+    - script: php bin/console test:run
   
 - stage: A
   dependsOn: Prepare
