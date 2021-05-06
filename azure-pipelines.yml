@@ -1,5 +1,6 @@
 
 variables:
+  COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
@@ -19,6 +20,14 @@ pool:
 stages:
 - stage: Prepare
   jobs:
+  - task: Cache@2
+    inputs:
+      key: 'composer | "$(Agent.OS)" | composer.lock'
+      restoreKeys: |
+        composer | "$(Agent.OS)"
+        composer
+      path: $(COMPOSER_CACHE_DIR)
+    displayName: Cache composer
   - job: "Composer_Install"
     steps:
       - script: composer install
@@ -26,6 +35,15 @@ stages:
         
 - stage: Test
   jobs:
+  - task: Cache@2
+    inputs:
+      key: 'composer | "$(Agent.OS)" | composer.lock'
+      restoreKeys: |
+        composer | "$(Agent.OS)"
+        composer
+      path: $(COMPOSER_CACHE_DIR)
+    displayName: Cache composer
+    
   - job: PhpUnit
     steps:
     - script: php bin/console test:run
