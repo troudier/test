@@ -39,7 +39,10 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor '
+          key: 'vendor | "$(Agent.OS)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)"
+            vendor
 #          restoreKeys: 'vendor | vendor/**'
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
@@ -64,7 +67,10 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor '
+        key: 'vendor | "$(Agent.OS)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)"
+          vendor
 #          restoreKeys: 'vendor | vendor/**'
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
@@ -92,7 +98,10 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor '
+        key: 'vendor | "$(Agent.OS)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)"
+          vendor
 #          restoreKeys: 'vendor | vendor/**'
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
