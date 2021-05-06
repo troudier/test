@@ -11,6 +11,8 @@ trigger:
     - releases/*
     - feature/*
     
+pool:
+  vmImage: ubuntu-latest
     
     
 stages:
@@ -28,12 +30,21 @@ stages:
       displayName: 'Run a multi-line script'
       
   - job: A2
+    dependsOn: A1
 
 - stage: B
   jobs:
   - job: B1
   - job: B2
-pool:
-  vmImage: ubuntu-latest
 
-
+- stage: deployment
+  - deployment: deploy prod        # instead of job keyword, use deployment keyword
+    pool:
+      name: string
+      demands: string | [ string ]
+    environment: prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: echo Hi!
