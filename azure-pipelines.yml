@@ -62,7 +62,7 @@ stages:
           steps:
           - script: echo Hi!
           
-  - deployment: deployProd     
+  - deployment: deployTest     
     condition: eq(variables.isMain, false)
     pool:
       vmImage: ubuntu-latest
