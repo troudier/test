@@ -184,8 +184,34 @@ stages:
       displayName: Cache vendors
      
       
-    - script: php-cs-fixer
-      displayName: php-cs-fixer fix --dry-run --allow-risky=yes --no-interaction --ansi
+    - script: php-cs-fixer fix --dry-run --allow-risky=yes --no-interaction --ansi
+      displayName: php-cs-fixer 
+    
+  - job: localPhpSecurityChecker
+    container: jakzal/phpqa:latest
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'composer | "$(Agent.OS)" | composer.lock'
+        restoreKeys: |
+          composer | "$(Agent.OS)"
+          composer
+        path: $(COMPOSER_CACHE_DIR)
+      displayName: Cache composer
+      
+    - task: Cache@2
+      inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)"
+          vendor
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
+     
+      
+    - script: local-php-security-checker
+      displayName: local-php-security-checker
       
 - stage: A
   dependsOn: Prepare
