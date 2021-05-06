@@ -21,7 +21,7 @@ stages:
 - stage: Prepare
   jobs:
   
-    displayName: Cache composer
+    
   - job: "Composer_Install"
     steps:
       - task: Cache@2
@@ -31,6 +31,8 @@ stages:
             composer | "$(Agent.OS)"
             composer
           path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
       - script: composer install
         displayName: install composer dependencies
         
