@@ -63,11 +63,11 @@ stages:
       displayName: Cache composer
       
     - task: Cache@2
-        inputs:
-          key: 'vendor '
+      inputs:
+        key: 'vendor '
 #          restoreKeys: 'vendor | vendor/**'
-          path: $(SYMFONY_VENDOR_DIR)
-        displayName: Cache vendors
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
       
     - script: php bin/console test:run
   
