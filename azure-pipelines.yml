@@ -1,7 +1,7 @@
 
 variables:
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
-  SYMFONY_VENDOR_DIR: $ (System. DefaultWorkingDirectory)/vendor
+  SYMFONY_VENDOR_DIR: $ (System.DefaultWorkingDirectory)/vendor
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
@@ -25,6 +25,9 @@ stages:
     
   - job: "ComposerInstall"
     steps:
+      - script: ls -l $(Pipeline.Workspace)
+        displayName: show workspace dir content 
+    
       - task: Cache@2
         inputs:
           key: 'composer | "$(Agent.OS)" | composer.lock'
