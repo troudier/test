@@ -265,6 +265,6 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpDocumentor src xml phpmd.xml 
+    - script: phpDocumentor
       displayName: phpDocumentor  
   
