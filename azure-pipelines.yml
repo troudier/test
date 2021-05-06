@@ -1,7 +1,7 @@
 
 variables:
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
-  SYMFONY_VENDOR_DIR: $(Pipeline.Workspace)/vendor
+  SYMFONY_VENDOR_DIR: $(Pipeline.Workspace)/vendors
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
@@ -36,10 +36,10 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'symfony_vendor | "$(Agent.OS)" | vendor'
+          key: 'symfony_vendors | "$(Agent.OS)" | vendors'
           restoreKeys: |
-            symfony_vendor | "$(Agent.OS)"
-            symfony_vendor
+            symfony_vendors | "$(Agent.OS)"
+            symfony_vendors
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
           
