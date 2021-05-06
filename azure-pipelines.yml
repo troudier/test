@@ -1,6 +1,7 @@
 
 variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  hasDeploy: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
 
 trigger:
@@ -45,6 +46,7 @@ stages:
   - job: B2
 
 - stage: deployment
+  dependsOn: [A, B]
   jobs:
   - deployment: deployProd     
     condition: eq(variables.isMain, true)
