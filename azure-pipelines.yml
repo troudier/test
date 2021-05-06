@@ -39,8 +39,8 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | vendor/**'
-          restoreKeys: 'vendor | vendor/**'
+          key: 'vendor '
+#          restoreKeys: 'vendor | vendor/**'
           path: $(SYMFONY_VENDOR_DIR)
           
         displayName: Cache vendors
