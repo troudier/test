@@ -185,7 +185,8 @@ stages:
      
       
     - script: php-cs-fixer
-      displayName: php-cs-fixer --dry-run --allow-risky=yes --no-interaction --ansi fix
+      displayName: php-cs-fixer fix --dry-run --allow-risky=yes --no-interaction --ansi
+      
 - stage: A
   dependsOn: Prepare
   jobs:
