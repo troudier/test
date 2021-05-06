@@ -10,10 +10,32 @@
         <cache>build/cache</cache>
     </paths>
     <version number="3.0.0">
-        <api>
-            <source dsn=".">
-                <path>src</path>
-            </source>
+        <api format="php">
+          <source dsn=".">
+            <!--1 or more repetitions:-->
+            <path>src</path>
+          </source>
+          <!--Optional:-->
+          <output>api</output>
+          <!--Optional:-->
+          <ignore hidden="true" symlinks="true">
+            <!--1 or more repetitions:-->
+            <path>tests/**/*</path>
+          </ignore>
+          <!--Optional:-->
+          <extensions>
+            <!--1 or more repetitions:-->
+            <extension>php</extension>
+          </extensions>
+          
+          <!--Optional:-->
+          <include-source>true</include-source>
+          <!--Optional:-->
+          <markers>
+            <!--1 or more repetitions:-->
+            <marker>TODO</marker>
+            <marker>FIXME</marker>
+          </markers>
         </api>
     </version>
 </phpdocumentor>
