@@ -131,7 +131,7 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phploc 
+    - script: phploc src 
       displayName: phploc   
       
       
