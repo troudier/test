@@ -16,6 +16,13 @@ pool:
     
     
 stages:
+- stage: Install
+  jobs:
+  - job: Composer 
+    steps:
+      - script: composer install
+        displayName: install composer dependencies
+  
 - stage: A
   jobs:
   - job: A1
@@ -48,5 +55,9 @@ stages:
         deploy:
           steps:
           - script: echo Hi!
+  - job: notify
+    steps:
+    - script: echo notify
+      displayName: send notification
           
           
