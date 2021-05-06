@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <parser>
+        <target>documentation/phpdoc</target>
+        <encoding>utf8</encoding>
+          <markers>
+            <item>TODO</item>
+            <item>FIXME</item>
+          </markers>
+          <extensions>
+                <extension>php</extension>
+          </extensions>
+    </parser>
+    <transformer>
+        <target>documentation/phpdoc</target>
+    </transformer>
+    <files>
+        <directory>src</directory>
+        <ignore>test/*</ignore>
+        <ignore>var/*</ignore>
+    </files>
+</phpdoc>

@@ -239,4 +239,32 @@ stages:
     - script: echo notify
       displayName: send notification
           
-          
+- stage: Document
+  dependsOn: [Test]  
+  jobs:
+  - job: Phpdocumentor
+    container: jakzal/phpqa:latest
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'composer | "$(Agent.OS)" | composer.lock'
+        restoreKeys: |
+          composer | "$(Agent.OS)"
+          composer
+        path: $(COMPOSER_CACHE_DIR)
+      displayName: Cache composer
+      
+    - task: Cache@2
+      inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)"
+          vendor
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
+     
+      
+    - script: phpDocumentor src xml phpmd.xml 
+      displayName: phpDocumentor  
+  
