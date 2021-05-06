@@ -185,7 +185,7 @@ stages:
      
       
     - script: php-cs-fixer
-      displayName: php-cs-fixer  
+      displayName: php-cs-fixer --dry-run --allow-risky=yes --no-interaction --ansi fix
 - stage: A
   dependsOn: Prepare
   jobs:
@@ -265,6 +265,6 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpdoc
+    - script: phpDocumentor
       displayName: phpDocumentor  
   
