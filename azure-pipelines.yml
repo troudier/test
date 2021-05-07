@@ -253,8 +253,9 @@ stages:
         
 - stage: Package
   dependsOn: QA
+  condition: eq(variables.hasDeploy, true)
   jobs:
-  - job: A1
+  - job: "Create project archive"
     steps:
 
     - script: echo Hello, world!
