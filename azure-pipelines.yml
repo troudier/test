@@ -200,6 +200,9 @@ stages:
       
     - script: php-cs-fixer fix --dry-run --allow-risky=yes --no-interaction --ansi
       displayName: php-cs-fixer 
+      
+    - script: php-cs-fixer list-files
+      displayName: php-cs-fixer 
     
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:latest
