@@ -70,7 +70,8 @@ stages:
       inputs:
         key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
         restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)" | phpUnit
           vendor | "$(Agent.OS)"
           vendor
         path: $(SYMFONY_VENDOR_DIR)
