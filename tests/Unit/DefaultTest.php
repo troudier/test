@@ -19,5 +19,3 @@ final class DefaultTest extends TestCase
         $this->assertSame(0, count($stack));
     }
 }
-
-
