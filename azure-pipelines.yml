@@ -80,6 +80,8 @@ stages:
       displayName: install phpUnit
     
     - script: php ./vendor/bin/phpunit
+      env:
+        XDEBUG_MODE: coverage
       displayName: execute tests
       
     - task: PublishTestResults@2
