@@ -350,7 +350,8 @@ stages:
       displayName: send notification    
             
 - stage: Document
-  dependsOn: [QA]  
+  dependsOn: [QA]
+  condition: eq(variables.hasDeploy, true)  
   jobs:
   - job: Phpdocumentor
     container: jakzal/phpqa:latest
