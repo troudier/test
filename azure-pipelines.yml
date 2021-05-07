@@ -319,9 +319,9 @@ stages:
     - script: echo notify
       displayName: send notification
       
-- stage: Functional Test
+- stage: FTest
   dependsOn: [Deploy]
-  condition: eq(variables.hasDeploy, true)
+  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
   jobs:
   - job: Jmeter Test
     steps:
@@ -356,7 +356,8 @@ stages:
   - job: notify
     steps:
     - script: echo notify
-      displayName: send notification          
+      displayName: send notification    
+            
 - stage: Document
   dependsOn: [QA]  
   jobs:
