@@ -255,9 +255,10 @@ stages:
   dependsOn: QA
   condition: eq(variables.hasDeploy, true)
   jobs:
-  - job: "Create project archive"
+  
+  
+  - job: ZipPackage
     steps:
-
     - script: echo Hello, world!
       displayName: 'Run a one-line script'
 
@@ -265,7 +266,28 @@ stages:
         echo Add other tasks to build, test, and deploy your project.
         echo See https://aka.ms/yaml
       displayName: 'Run a multi-line script'
+      
+  - job: DockerPackage
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
 
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+  - job: HelmPackage
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+      
 - stage: Deploy
   dependsOn: [Package]
   condition: eq(variables.hasDeploy, true)
