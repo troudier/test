@@ -61,6 +61,7 @@ stages:
       inputs:
         key: 'composer | "$(Agent.OS)" | composer.lock'
         restoreKeys: |
+          composer | "$(Agent.OS)" | phpUnit
           composer | "$(Agent.OS)"
           composer
         path: $(COMPOSER_CACHE_DIR)
