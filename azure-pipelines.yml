@@ -93,7 +93,8 @@ stages:
         
     - task: PublishCodeCoverageResults@1
       inputs:
-        summaryFileLocation: build/phpunit/coverage.xml
+        codeCoverageTool: Cobertura
+        summaryFileLocation: build/phpunit/coverage-cobertura.xml
       
   - job: Phpmd
     container: jakzal/phpqa:latest

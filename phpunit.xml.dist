@@ -6,7 +6,7 @@
     </include>
     <report>
       <clover outputFile="./build/phpunit/coverage-clover.xml"/>
-      <cobertura outputFile="./build/phpunit/coverage.xml"/>
+      <cobertura outputFile="./build/phpunit/coverage-cobertura.xml"/>
       <xml outputDirectory="./build/phpunit/coverage"/>
     </report>
   </coverage>
