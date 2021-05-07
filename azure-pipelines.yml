@@ -323,7 +323,7 @@ stages:
   dependsOn: [Deploy]
   condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
   jobs:
-  - job: Jmeter Test
+  - job: JmeterTest
     steps:
     - script: echo Hello, world!
       displayName: 'Run a one-line script'
@@ -333,17 +333,7 @@ stages:
         echo See https://aka.ms/yaml
       displayName: 'Run a multi-line script'
       
-  - job: DockerPackage
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
-
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
-      
-  - job: HelmPackage
+  - job: SomeOtherTest
     steps:
     - script: echo Hello, world!
       displayName: 'Run a one-line script'
@@ -354,6 +344,7 @@ stages:
       displayName: 'Run a multi-line script'
           
   - job: notify
+    dependsOn: [JmeterTest, SomeOtherTest]
     steps:
     - script: echo notify
       displayName: send notification    
