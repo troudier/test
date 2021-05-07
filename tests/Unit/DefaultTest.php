@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 
 final class DefaultTest extends TestCase
 {
-    public function testPushAndPop(): void
+    public function testDefault(): void
     {
         $stack = [];
         $this->assertSame(0, count($stack));
