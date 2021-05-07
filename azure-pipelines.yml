@@ -90,6 +90,10 @@ stages:
 #   Options: JUnit, NUnit, VSTest, xUnit, cTest
         testResultsFiles: build/phpunit/index.xml
         publishRunAttachments: true
+        
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        summaryFileLocation: build/phpunit/coverage.xml
       
   - job: Phpmd
     container: jakzal/phpqa:latest
