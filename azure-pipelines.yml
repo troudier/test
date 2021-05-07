@@ -21,8 +21,6 @@ pool:
 stages:
 - stage: Prepare
   jobs:
-  
-    
   - job: "ComposerInstall"
     steps:
       - script: ls -l $(Build.SourcesDirectory)
@@ -51,10 +49,8 @@ stages:
       - script: composer install
         displayName: install composer dependencies
         
-- stage: Test
+- stage: QA
   jobs:
-  
-    
   - job: PhpUnit
     steps:
     - task: Cache@2
@@ -255,8 +251,8 @@ stages:
     - script: phpcpd src
       displayName: phpcpd
         
-- stage: A
-  dependsOn: Prepare
+- stage: Package
+  dependsOn: QA
   jobs:
   - job: A1
     steps:
@@ -268,18 +264,9 @@ stages:
         echo Add other tasks to build, test, and deploy your project.
         echo See https://aka.ms/yaml
       displayName: 'Run a multi-line script'
-      
-  - job: A2
-    dependsOn: A1
 
-- stage: B
-  dependsOn: Prepare
-  jobs:
-  - job: B1
-  - job: B2
-
-- stage: deployment
-  dependsOn: [A, B]
+- stage: Deploy
+  dependsOn: [Package]
   condition: eq(variables.hasDeploy, true)
   jobs:
   - deployment: deployProd     
@@ -309,7 +296,7 @@ stages:
       displayName: send notification
           
 - stage: Document
-  dependsOn: [Test]  
+  dependsOn: [QA, Deploy]  
   jobs:
   - job: Phpdocumentor
     container: jakzal/phpqa:latest
