@@ -200,9 +200,6 @@ stages:
       
     - script: php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose --dry-run --allow-risky=yes --no-interaction --ansi
       displayName: php-cs-fixer 
-      
-    - script: php-cs-fixer list-files --config=.php-cs-fixer.dist.php
-      displayName: php-cs-fixer list files
     
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:latest
@@ -335,6 +332,6 @@ stages:
       displayName: Cache vendors
      
       
-    - script: phpDocumentor
-      displayName: phpDocumentor  
+    #- script: phpDocumentor
+    #  displayName: phpDocumentor  
   
