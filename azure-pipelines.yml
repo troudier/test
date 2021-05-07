@@ -82,6 +82,13 @@ stages:
     - script: php ./vendor/bin/phpunit
       displayName: execute tests
       
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit' 
+#   Options: JUnit, NUnit, VSTest, xUnit, cTest
+        testResultsFiles: build/phpunit/index.xml
+        publishRunAttachments: true
+      
   - job: Phpmd
     container: jakzal/phpqa:latest
     steps:

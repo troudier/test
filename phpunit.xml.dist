@@ -5,8 +5,8 @@
       <directory>src</directory>
     </include>
     <report>
-      <clover outputFile="../build/phpunit/coverage.xml"/>
-      <xml outputDirectory="../build/phpunit/coverage"/>
+      <clover outputFile="./build/phpunit/coverage.xml"/>
+      <xml outputDirectory="./build/phpunit/coverage"/>
     </report>
   </coverage>
   <php>
@@ -28,6 +28,6 @@
     <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
   </listeners>
   <logging>
-    <junit outputFile="../build/phpunit/index.xml"/>
+    <junit outputFile="./build/phpunit/index.xml"/>
   </logging>
 </phpunit>
