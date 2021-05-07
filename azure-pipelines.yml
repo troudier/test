@@ -202,7 +202,7 @@ stages:
       displayName: php-cs-fixer 
       
     - script: php-cs-fixer list-files --config=.php-cs-fixer.dist.php
-      displayName: php-cs-fixer 
+      displayName: php-cs-fixer list files
     
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:latest
