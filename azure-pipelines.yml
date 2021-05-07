@@ -198,10 +198,10 @@ stages:
       displayName: Cache vendors
      
       
-    - script: php-cs-fixer fix --dry-run --allow-risky=yes --no-interaction --ansi
+    - script: php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose --dry-run --allow-risky=yes --no-interaction --ansi
       displayName: php-cs-fixer 
       
-    - script: php-cs-fixer list-files
+    - script: php-cs-fixer list-files --config=.php-cs-fixer.dist.php
       displayName: php-cs-fixer 
     
   - job: localPhpSecurityChecker
