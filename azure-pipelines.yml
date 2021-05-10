@@ -9,7 +9,7 @@ variables:
 trigger:
   branches:
     include:
-    - master
+    - main
     - develop
     - releases/*
     - feature/*
