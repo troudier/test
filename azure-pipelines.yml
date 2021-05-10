@@ -21,8 +21,6 @@ pool:
 stages:
 - stage: Prepare
   jobs:
-  
-    
   - job: "ComposerInstall"
     steps:
       - script: ls -l $(Build.SourcesDirectory)
@@ -51,16 +49,15 @@ stages:
       - script: composer install
         displayName: install composer dependencies
         
-- stage: Test
+- stage: QA
   jobs:
-  
-    
   - job: PhpUnit
     steps:
     - task: Cache@2
       inputs:
         key: 'composer | "$(Agent.OS)" | composer.lock'
         restoreKeys: |
+          composer | "$(Agent.OS)" | phpUnit
           composer | "$(Agent.OS)"
           composer
         path: $(COMPOSER_CACHE_DIR)
@@ -70,7 +67,8 @@ stages:
       inputs:
         key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
         restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)" | phpUnit
           vendor | "$(Agent.OS)"
           vendor
         path: $(SYMFONY_VENDOR_DIR)
@@ -253,12 +251,28 @@ stages:
     - script: phpcpd src
       displayName: phpcpd
         
-- stage: A
-  dependsOn: Prepare
+- stage: Package
+  dependsOn: QA
+  condition: eq(variables.hasDeploy, true)
   jobs:
-  - job: A1
+  
+  
+  - job: ZipPackage
     steps:
+    - task: ArchiveFiles@1
+      displayName: Archive files
+      inputs:
+        rootFolder: $(System.DefaultWorkingDirectory)
+        includeRootFolder: false
+        archiveType: zip
 
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact
+      inputs:
+        PathtoPublish: $(build.artifactstagingdirectory)
+      
+  - job: DockerPackage
+    steps:
     - script: echo Hello, world!
       displayName: 'Run a one-line script'
 
@@ -267,17 +281,19 @@ stages:
         echo See https://aka.ms/yaml
       displayName: 'Run a multi-line script'
       
-  - job: A2
-    dependsOn: A1
+  - job: HelmPackage
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
 
-- stage: B
-  dependsOn: Prepare
-  jobs:
-  - job: B1
-  - job: B2
-
-- stage: deployment
-  dependsOn: [A, B]
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+      
+- stage: Deploy
+  dependsOn: [Package]
   condition: eq(variables.hasDeploy, true)
   jobs:
   - deployment: deployProd     
@@ -302,12 +318,44 @@ stages:
           steps:
           - script: echo Hi!
   - job: notify
+    dependsOn: [deployProd, deployTest]
     steps:
     - script: echo notify
       displayName: send notification
+      
+- stage: FTest
+  dependsOn: [Deploy]
+  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
+  jobs:
+  - job: JmeterTest
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+  - job: SomeOtherTest
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
           
+  - job: notify
+    dependsOn: [JmeterTest, SomeOtherTest]
+    steps:
+    - script: echo notify
+      displayName: send notification    
+            
 - stage: Document
-  dependsOn: [Test]  
+  dependsOn: [QA]
+  condition: eq(variables.hasDeploy, true)  
   jobs:
   - job: Phpdocumentor
     container: jakzal/phpqa:latest
