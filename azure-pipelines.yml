@@ -281,6 +281,8 @@ stages:
       inputs:
         PathtoPublish: $(build.artifactstagingdirectory)
         artifactName: DemoArtifact
+  
+  - script: echo Hi!
       
   - job: DockerPackage
     steps:
