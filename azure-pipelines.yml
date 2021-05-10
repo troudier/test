@@ -259,6 +259,16 @@ stages:
   
   - job: ZipPackage
     steps:
+    - task: Cache@2
+      inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)"
+          vendor
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
+    
     - task: ArchiveFiles@1
       displayName: Archive files
       inputs:
