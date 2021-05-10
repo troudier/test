@@ -270,6 +270,7 @@ stages:
       displayName: Publish Artifact
       inputs:
         PathtoPublish: $(build.artifactstagingdirectory)
+        artifactName: DemoArtifact
       
   - job: DockerPackage
     steps:
