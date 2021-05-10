@@ -96,6 +96,7 @@ stages:
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: build/phpunit/coverage-cobertura.xml
+        publishRunAttachments: true
       
   - job: Phpmd
     container: jakzal/phpqa:latest
