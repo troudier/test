@@ -257,6 +257,7 @@ stages:
         
 - stage: Package
   dependsOn: QA
+  condition: eq(variables.hasDeploy, true)
   jobs:
   
   
@@ -308,66 +309,66 @@ stages:
       displayName: 'Run a multi-line script'
       
       
-- stage: Deploy
-  dependsOn: [Package]
-  condition: eq(variables.hasDeploy, true)
-  jobs:
-  - deployment: deployProd     
-    condition: eq(variables.isMain, true)
-    pool:
-      vmImage: ubuntu-latest
-    environment: prod
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - script: echo Hi!
+#- stage: Deploy
+#  dependsOn: [Package]
+#  condition: eq(variables.hasDeploy, true)
+#  jobs:
+#  - deployment: deployProd     
+#    condition: eq(variables.isMain, true)
+#    pool:
+#      vmImage: ubuntu-latest
+#    environment: prod
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo Hi!
           
-  - deployment: deployTest     
-    condition: eq(variables.isMain, false)
-    pool:
-      vmImage: ubuntu-latest
-    environment: test
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - script: echo Hi!
-  - job: notify
-    dependsOn: [deployProd, deployTest]
-    steps:
-    - script: echo notify
-      displayName: send notification
+#  - deployment: deployTest     
+#    condition: eq(variables.isMain, false)
+#    pool:
+#      vmImage: ubuntu-latest
+#    environment: test
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo Hi!
+#  - job: notify
+#    dependsOn: [deployProd, deployTest]
+#    steps:
+#    - script: echo notify
+#      displayName: send notification
       
-- stage: FTest
-  dependsOn: [Deploy]
-  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
-  jobs:
-  - job: JmeterTest
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
+#- stage: FTest
+#  dependsOn: [Deploy]
+#  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
+#  jobs:
+#  - job: JmeterTest
+#    steps:
+#    - script: echo Hello, world!
+#      displayName: 'Run a one-line script'
 
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
+#    - script: |
+#        echo Add other tasks to build, test, and deploy your project.
+#        echo See https://aka.ms/yaml
+#      displayName: 'Run a multi-line script'
       
-  - job: SomeOtherTest
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
+#  - job: SomeOtherTest
+#    steps:
+#    - script: echo Hello, world!
+#      displayName: 'Run a one-line script'
 
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
+#    - script: |
+#        echo Add other tasks to build, test, and deploy your project.
+#        echo See https://aka.ms/yaml
+#      displayName: 'Run a multi-line script'
           
-  - job: notify
-    dependsOn: [JmeterTest, SomeOtherTest]
-    steps:
-    - script: echo notify
-      displayName: send notification    
+#  - job: notify
+#    dependsOn: [JmeterTest, SomeOtherTest]
+#    steps:
+#    - script: echo notify
+#      displayName: send notification    
             
 - stage: Document
   dependsOn: [QA]
