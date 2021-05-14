@@ -292,4 +292,151 @@ stages:
       - script: phpcpd src
         displayName: phpcpd
         
+
+
+
+
+- stage: Package
+  dependsOn: QA
+  condition: eq(variables.hasDeploy, true)
+  jobs:
+  
+  
+  - job: ZipPackage
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)"
+          vendor
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
     
+    - task: ArchiveFiles@1
+      displayName: Archive files
+      inputs:
+        rootFolder: $(System.DefaultWorkingDirectory)
+        includeRootFolder: false
+        archiveType: zip
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact
+      inputs:
+        PathtoPublish: $(build.artifactstagingdirectory)
+        artifactName: DemoArtifact
+  
+    - script: echo Hi!
+      
+  - job: DockerPackage
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+  - job: HelmPackage
+    steps:
+    - script: echo Hello, world!
+      displayName: 'Run a one-line script'
+
+    - script: |
+        echo Add other tasks to build, test, and deploy your project.
+        echo See https://aka.ms/yaml
+      displayName: 'Run a multi-line script'
+      
+      
+#- stage: Deploy
+#  dependsOn: [Package]
+#  condition: eq(variables.hasDeploy, true)
+#  jobs:
+#  - deployment: deployProd     
+#    condition: eq(variables.isMain, true)
+#    pool:
+#      vmImage: ubuntu-latest
+#    environment: prod
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo Hi!
+          
+#  - deployment: deployTest     
+#    condition: eq(variables.isMain, false)
+#    pool:
+#      vmImage: ubuntu-latest
+#    environment: test
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - script: echo Hi!
+#  - job: notify
+#    dependsOn: [deployProd, deployTest]
+#    steps:
+#    - script: echo notify
+#      displayName: send notification
+      
+#- stage: FTest
+#  dependsOn: [Deploy]
+#  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
+#  jobs:
+#  - job: JmeterTest
+#    steps:
+#    - script: echo Hello, world!
+#      displayName: 'Run a one-line script'
+
+#    - script: |
+#        echo Add other tasks to build, test, and deploy your project.
+#        echo See https://aka.ms/yaml
+#      displayName: 'Run a multi-line script'
+      
+#  - job: SomeOtherTest
+#    steps:
+#    - script: echo Hello, world!
+#      displayName: 'Run a one-line script'
+
+#    - script: |
+#        echo Add other tasks to build, test, and deploy your project.
+#        echo See https://aka.ms/yaml
+#      displayName: 'Run a multi-line script'
+          
+#  - job: notify
+#    dependsOn: [JmeterTest, SomeOtherTest]
+#    steps:
+#    - script: echo notify
+#      displayName: send notification    
+            
+- stage: Document
+  dependsOn: [QA]
+  condition: eq(variables.hasDeploy, true)  
+  jobs:
+  - job: Phpdocumentor
+    container: jakzal/phpqa:latest
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'composer | "$(Agent.OS)" | composer.lock'
+        restoreKeys: |
+          composer | "$(Agent.OS)"
+          composer
+        path: $(COMPOSER_CACHE_DIR)
+      displayName: Cache composer
+      
+    - task: Cache@2
+      inputs:
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        restoreKeys: |
+          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+          vendor | "$(Agent.OS)"
+          vendor
+        path: $(SYMFONY_VENDOR_DIR)
+      displayName: Cache vendors
+     
+      
+    #- script: phpDocumentor
+    #  displayName: phpDocumentor      
