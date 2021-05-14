@@ -150,7 +150,7 @@ stages:
         displayName: phpmd - report
         
         
-      - task: PublishBuildArtifacts@1
+      - task: PublishPipelineArtifacts@1
         displayName: Publish Artifact
         condition: succeededOrFailed()
         inputs:
