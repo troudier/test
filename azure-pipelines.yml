@@ -152,6 +152,7 @@ stages:
         
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
+        condition: succeededOrFailed()
         inputs:
           PathtoPublish: build/phpmd/
           artifactName: PhpmdReport
