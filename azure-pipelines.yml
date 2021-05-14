@@ -79,7 +79,7 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+        key: 'composer | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)" | composer.lock'
         restoreKeys: |
           composer | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
           composer | "$(Agent.OS)" | phpUnit
@@ -90,7 +90,7 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        key: 'vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"'
         restoreKeys: |
           vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)" | phpUnit
