@@ -1,0 +1,185 @@
+personnes_liste:
+  path: /api/v1/personnes
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::liste
+
+personnes_fiche:
+  path: /api/v1/personnes/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::fiche
+
+personne_create:
+  path: /api/v1/personnes
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\PersonneController::add
+
+personne_fonction_create:
+  path: /api/v1/personne-fonction
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\PersonneController::addPersonneFonction
+
+personne_update:
+  path: /api/v1/personnes/{uuid}
+  methods: ['PUT']
+  defaults:
+    _controller: App\Controller\PersonneController::update
+
+personnes_liens:
+  path: /api/v1/personnes/liens/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getLiens
+
+personnes_champs_utilises:
+  path: /api/v1/personnes/champs/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getChamps
+
+personnes_champs_dispos:
+  path: /api/v1/personnes/champs-disponibles/{target}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\ChampController::getChampsDisponibles
+
+personnes_coordonnnes:
+  path: /api/v1/personnes/coordonnees/all/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\CoordonneesController::getCoordonnees
+
+personnes_coordonnnes_types:
+  path: /api/v1/personnes/coordonnees/types
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\CoordonneesController::getCoordonneesTypes
+
+personnes_adresses:
+  path: /api/v1/personnes/adresses/all/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\AdresseController::getAdresses
+
+personnes_adresses_types:
+  path: /api/v1/personnes/adresses/types
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\AdresseController::getAdressesTypes
+
+personnes_insert_tagss:
+  path: /api/v1/personnes/tags
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\PersonneController::insertTags
+
+personnes_users:
+  path: /api/v1/personnes-users
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getListePersonnesUsers
+
+personnes_current:
+  path: /api/v1/personne-current
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getPersonneCourante
+
+personne_statut_liste:
+  path: /api/v1/personne-statuts
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getStatuts
+
+personne_physique_champs:
+  path: /api/v1/personnes/physique/champs
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonnePhysiqueController::getChampsCreation
+
+personne_morale_champs:
+  path: /api/v1/personnes/morale/champs
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getChampsCreation
+
+personne_fonction_champs:
+  path: /api/v1/personnes/fonction/champs
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getChampsCreation
+
+personne_physique_select:
+  path: /api/v1/personnes/physique/select
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonnePhysiqueController::getListe
+
+personne_titres_liste:
+  path: /api/v1/personnes/physique/titres
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonnePhysiqueController::getTitres
+
+personnes_fonctions:
+  path: /api/v1/personnes-fonctions
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getPersonnesFonctions
+
+personnes_select:
+  path: /api/v1/personnes-select/{type}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\PersonneController::getPersonnesSelect
+
+tags_liste:
+  path: /api/v1/tags
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\TagController::getTags
+
+origines_liste:
+  path: /api/v1/origines
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\OrigineController::getOrigines
+
+memo_ajout:
+  path: /api/v1/memos
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\MemoController::add
+
+tel_indicatifs_liste:
+  path: /api/v1/telephones/indicatifs
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\TelephoneController::getIndicatifs
+
+personne_forme_juridique:
+  path: /api/v1/personne-forme-juridique
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getFormeJuridique
+
+personne_effectif:
+  path: /api/v1/personne-effectif
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getEffectif
+
+personne_chiffre_affaire:
+  path: /api/v1/personne-chiffre-affaire
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getChiffreAffaire
+
+personne_organisation_parente:
+  path: /api/v1/personne-organisation-parente
+  methods: [ 'GET' ]
+  defaults:
+    _controller: App\Controller\PersonneMoraleController::getOrganisationParente

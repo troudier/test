@@ -1,0 +1,11 @@
+liste_intervenants:
+  path: /api/v1/intervenants/{uuid}/{type}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\HelperController::getIntervenants
+
+vocabulaire_entites:
+  path: /api/v1/dictionnaire/{type}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\HelperController::getDictionnaire

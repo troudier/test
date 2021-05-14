@@ -1,9 +1,10 @@
-
+  
 variables:
+  phpVersion: 7.4
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
   SYMFONY_VENDOR_DIR: $(Build.SourcesDirectory)/vendor
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
-  hasDeploy: $[or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
+#  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+#  hasDeploy: $[or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
 
 trigger:
@@ -23,14 +24,26 @@ stages:
 - stage: Prepare
   jobs:
   - job: "ComposerInstall"
+    pool:
+      vmImage: 'Ubuntu 16.04'
     steps:
+      - script: |
+          sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+          sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+          sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+          sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+          sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+          php -version
+        displayName: 'Use PHP version $(phpVersion)'
+        
       - script: ls -l $(Build.SourcesDirectory)
         displayName: show workspace dir content 
     
       - task: Cache@2
         inputs:
-          key: 'composer | "$(Agent.OS)" | composer.lock'
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
             composer | "$(Agent.OS)"
             composer
           path: $(COMPOSER_CACHE_DIR)
@@ -43,21 +56,32 @@ stages:
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
             vendor
-#          restoreKeys: 'vendor | vendor/**'
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
           
-      - script: composer install
-        displayName: install composer dependencies
+      - script: composer install --no-interaction --prefer-dist --no-scripts
+        displayName: 'composer install'
         
 - stage: QA
   jobs:
   - job: PhpUnit
+    pool:
+      vmImage: 'Ubuntu 16.04'
     steps:
+    - script: |
+        sudo update-alternatives --set php /usr/bin/php$(phpVersion)
+        sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
+        sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+        sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+        sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
+        php -version
+      displayName: 'Use PHP version $(phpVersion)'
+      
     - task: Cache@2
       inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
+        key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
         restoreKeys: |
+          composer | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
           composer | "$(Agent.OS)" | phpUnit
           composer | "$(Agent.OS)"
           composer
@@ -75,7 +99,7 @@ stages:
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
       
-    - script: composer require --dev phpunit/phpunit symfony/test-pack
+    - script: composer require --no-scripts --dev phpunit/phpunit symfony/test-pack
       displayName: install phpUnit
     
     - script: php ./vendor/bin/phpunit
@@ -97,304 +121,175 @@ stages:
         publishRunAttachments: true
       
   - job: Phpmd
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
-      
-    - script: phpmd src xml phpmd.xml 
-      displayName: phpmd
+      - script: phpmd src text phpmd.xml --exclude 'tests/*,vendor/*' --reportfile build/phpmd/phpmd-report.txt --ignore-violations-on-exit
+        displayName: phpmd - text
+        
+      - script: phpmd src xml phpmd.xml --exclude 'tests/*,vendor/*' --reportfile build/phpmd/phpmd-report.xml
+        displayName: phpmd - report
+        
+        
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
+        inputs:
+          PathtoPublish: build/phpmd/
+          artifactName: PhpmdReport
       
   - job: Phploc
     container: jakzal/phpqa:latest
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
       
-    - script: phploc src tests --log-xml=phploc.xml --count-tests 
-      displayName: phploc   
+      - script: phploc src tests --log-xml=phploc.xml --count-tests 
+        displayName: phploc   
       
       
   - job: Phpcs
     container: jakzal/phpqa:latest
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
       
-    - script: phpcs src
-      displayName: phpcs 
+      - script: phpcs src
+        displayName: phpcs 
       
   - job: Php_cs_fixer
     container: jakzal/phpqa:latest
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
       
-    - script: php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose --dry-run --allow-risky=yes --no-interaction --ansi
-      displayName: php-cs-fixer 
+      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --ansi
+        displayName: php-cs-fixer 
     
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:latest
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
       
-    - script: local-php-security-checker
-      displayName: local-php-security-checker
+      - script: local-php-security-checker
+        displayName: local-php-security-checker
       
   - job: phpcpd
     container: jakzal/phpqa:latest
     steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
+      - task: Cache@2
+        inputs:
+          key: 'composer | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+          restoreKeys: |
+            composer | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            composer | "$(Agent.OS)"
+            composer
+          path: $(COMPOSER_CACHE_DIR)
+        displayName: Cache composer  
+          
+      - task: Cache@2
+        inputs:
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          restoreKeys: |
+            vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+            vendor | "$(Agent.OS)"
+            vendor
+          path: $(SYMFONY_VENDOR_DIR)
+        displayName: Cache vendors
      
       
-    - script: phpcpd src
-      displayName: phpcpd
+      - script: phpcpd src
+        displayName: phpcpd
         
-- stage: Package
-  dependsOn: QA
-  condition: eq(variables.hasDeploy, true)
-  jobs:
-  
-  
-  - job: ZipPackage
-    steps:
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
     
-    - task: ArchiveFiles@1
-      displayName: Archive files
-      inputs:
-        rootFolder: $(System.DefaultWorkingDirectory)
-        includeRootFolder: false
-        archiveType: zip
-
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Artifact
-      inputs:
-        PathtoPublish: $(build.artifactstagingdirectory)
-        artifactName: DemoArtifact
-  
-    - script: echo Hi!
-      
-  - job: DockerPackage
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
-
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
-      
-  - job: HelmPackage
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
-
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
-      
-      
-#- stage: Deploy
-#  dependsOn: [Package]
-#  condition: eq(variables.hasDeploy, true)
-#  jobs:
-#  - deployment: deployProd     
-#    condition: eq(variables.isMain, true)
-#    pool:
-#      vmImage: ubuntu-latest
-#    environment: prod
-#    strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#          - script: echo Hi!
-          
-#  - deployment: deployTest     
-#    condition: eq(variables.isMain, false)
-#    pool:
-#      vmImage: ubuntu-latest
-#    environment: test
-#    strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#          - script: echo Hi!
-#  - job: notify
-#    dependsOn: [deployProd, deployTest]
-#    steps:
-#    - script: echo notify
-#      displayName: send notification
-      
-#- stage: FTest
-#  dependsOn: [Deploy]
-#  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
-#  jobs:
-#  - job: JmeterTest
-#    steps:
-#    - script: echo Hello, world!
-#      displayName: 'Run a one-line script'
-
-#    - script: |
-#        echo Add other tasks to build, test, and deploy your project.
-#        echo See https://aka.ms/yaml
-#      displayName: 'Run a multi-line script'
-      
-#  - job: SomeOtherTest
-#    steps:
-#    - script: echo Hello, world!
-#      displayName: 'Run a one-line script'
-
-#    - script: |
-#        echo Add other tasks to build, test, and deploy your project.
-#        echo See https://aka.ms/yaml
-#      displayName: 'Run a multi-line script'
-          
-#  - job: notify
-#    dependsOn: [JmeterTest, SomeOtherTest]
-#    steps:
-#    - script: echo notify
-#      displayName: send notification    
-            
-- stage: Document
-  dependsOn: [QA]
-  condition: eq(variables.hasDeploy, true)  
-  jobs:
-  - job: Phpdocumentor
-    container: jakzal/phpqa:latest
-    steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
-     
-      
-    #- script: phpDocumentor
-    #  displayName: phpDocumentor  
-  
