@@ -181,7 +181,7 @@ stages:
         displayName: Cache vendors
      
       
-      - script: phploc src tests --log-xml=build/phploc/phploc.xml --log-text=build/phploc/phploc.txt --count-tests 
+      - script: phploc src tests --log-xml=build/phploc/phploc.xml --log-txt=build/phploc/phploc.txt --count-tests 
         displayName: phploc   
       
       - task: PublishBuildArtifacts@1
