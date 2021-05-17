@@ -321,6 +321,7 @@ stages:
         maxTestFailuresToShow: '15'
         includeOthersInTotal: false
         usePreviousEnvironment: false
+        smtpConnectionEndpoint: 'smtpforci'
 
 - stage: Package
   dependsOn: QA
