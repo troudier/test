@@ -181,17 +181,17 @@ stages:
         displayName: Cache vendors
      
       
-      - script: phploc src tests --log-xml=./build/phploc/phploc.xml --count-tests
+      - script: phploc src tests --log-xml=phploc.xml --count-tests
         displayName: phploc   
       
-      - script: phploc src tests --count-tests >> ./build/phploc/phploc.txt
+      - script: phploc src tests --count-tests >> phploc.txt
         displayName: phploc - text report
       
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
         condition: succeededOrFailed()
         inputs:
-          PathtoPublish: build/phploc/
+          PathtoPublish: phploc.*
           artifactName: PhplocReport
           
   - job: Phpcs
