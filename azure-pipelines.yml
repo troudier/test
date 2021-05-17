@@ -308,6 +308,7 @@ stages:
 
   - job: notify
     dependsOn: [Phpmd,Phploc, PhpUnit]
+    condition: succeededOrFailed()
     steps:
     - task: EmailReport@1
       inputs:
