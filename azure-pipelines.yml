@@ -184,6 +184,9 @@ stages:
       - script: phploc src tests --log-xml=build/phploc/phploc.xml --count-tests >> $(Pipeline.Workspace)/build/phploc/phploc.txt
         displayName: phploc   
       
+      - script: phploc src tests --count-tests >>build/phploc/phploc.txt
+        displayName: phploc - text report
+      
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
         condition: succeededOrFailed()
