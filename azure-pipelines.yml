@@ -306,7 +306,20 @@ stages:
         
 
 
-
+  - job: notify
+    dependOn: [Phpmd,Phploc, PhpUnit]
+    steps:
+    - task: EmailReport@1
+      inputs:
+        sendMailConditionConfig: 'Always'
+        subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
+        defaultDomain: 'microsoft.com'
+        includeResultsStr: '1, 2'
+        groupTestResultsBy: 'run'
+        includeCommits: true
+        maxTestFailuresToShow: '15'
+        includeOthersInTotal: false
+        usePreviousEnvironment: false
 
 - stage: Package
   dependsOn: QA
