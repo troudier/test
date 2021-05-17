@@ -181,10 +181,10 @@ stages:
         displayName: Cache vendors
      
       
-      - script: phploc src tests --log-xml=build/phploc/phploc.xml --count-tests
+      - script: phploc src tests --log-xml=./build/phploc/phploc.xml --count-tests
         displayName: phploc   
       
-      - script: phploc src tests --count-tests >> $(Pipeline.Workspace)/build/phploc/phploc.txt
+      - script: phploc src tests --count-tests >> ./build/phploc/phploc.txt
         displayName: phploc - text report
       
       - task: PublishBuildArtifacts@1
