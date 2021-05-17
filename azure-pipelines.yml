@@ -307,7 +307,7 @@ stages:
 
 
   - job: notify
-    dependOn: [Phpmd,Phploc, PhpUnit]
+    dependsOn: [Phpmd,Phploc, PhpUnit]
     steps:
     - task: EmailReport@1
       inputs:
