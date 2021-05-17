@@ -187,6 +187,9 @@ stages:
       - script: phploc src tests --count-tests >> phploc.txt
         displayName: phploc - text report
       
+      - script: ls -la
+        displayName: show files
+      
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
         condition: succeededOrFailed()
