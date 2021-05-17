@@ -181,14 +181,11 @@ stages:
         displayName: Cache vendors
      
       - script: mkdir -p build/phploc
-        displayName: show files
+        displayName: create report dir
         
       - script: phploc src tests --log-xml=build/phploc/phploc.xml --count-tests >> build/phploc/phploc.txt
         displayName: phploc   
-      
-      - script: ls -la
-        displayName: show files
-      
+     
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
         condition: succeededOrFailed()
@@ -219,9 +216,19 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-      
-      - script: phpcs src
+      - script: mkdir -p build/phpcs
+        displayName: create report dir
+        
+      - script: phpcs src >> build/phploc/phpcs.txt
         displayName: phpcs 
+        
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
+        condition: succeededOrFailed()
+        inputs:
+          PathtoPublish: build/phpcs
+          artifactName: PhpcsReport
+      
       
   - job: Php_cs_fixer
     container: jakzal/phpqa:php$(phpVersion)
@@ -246,9 +253,19 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-      
-      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --ansi
+      - script: mkdir -p build/php-cs-fixer
+        displayName: create report dir
+        
+      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --ansi >> build/php-cs-fixer/php-cs-fixer.txt
         displayName: php-cs-fixer 
+        
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
+        condition: succeededOrFailed()
+        inputs:
+          PathtoPublish: build/php-cs-fixer
+          artifactName: Php-cs-fixerReport
+      
     
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:php$(phpVersion)
@@ -273,10 +290,19 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-      
-      - script: local-php-security-checker
-        displayName: local-php-security-checker
-      
+      - script: mkdir -p build/local-php-security-checker
+        displayName: create report dir
+        
+      - script: local-php-security-checker >> build/local-php-security-checker/local-php-security-checker.txt
+        displayName: local-php-security-checker 
+        
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
+        condition: succeededOrFailed()
+        inputs:
+          PathtoPublish: build/local-php-security-checker
+          artifactName: local-php-security-checkerReport
+          
   - job: phpcpd
     container: jakzal/phpqa:php$(phpVersion)
     steps:
@@ -300,11 +326,18 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-      
-      - script: phpcpd src
-        displayName: phpcpd
+      - script: mkdir -p build/phpcpd
+        displayName: create report dir
         
-
+      - script: phpcpd src >> build/phpcpd/phpcpd.txt
+        displayName: phpcpd 
+        
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifact
+        condition: succeededOrFailed()
+        inputs:
+          PathtoPublish: build/phpcpd
+          artifactName: phpcpdReport
 
   - job: notify
     dependsOn: [Phpmd,Phploc, PhpUnit]
