@@ -158,7 +158,7 @@ stages:
           artifactName: PhpmdReport
       
   - job: Phploc
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
       - task: Cache@2
         inputs:
@@ -192,7 +192,7 @@ stages:
           artifactName: PhpmdReport
           
   - job: Phpcs
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
       - task: Cache@2
         inputs:
@@ -219,7 +219,7 @@ stages:
         displayName: phpcs 
       
   - job: Php_cs_fixer
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
       - task: Cache@2
         inputs:
@@ -246,7 +246,7 @@ stages:
         displayName: php-cs-fixer 
     
   - job: localPhpSecurityChecker
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
       - task: Cache@2
         inputs:
@@ -273,7 +273,7 @@ stages:
         displayName: local-php-security-checker
       
   - job: phpcpd
-    container: jakzal/phpqa:latest
+    container: jakzal/phpqa:php$(phpVersion)
     steps:
       - task: Cache@2
         inputs:
