@@ -215,8 +215,8 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-#      - script: mkdir -p build/phpcs
-#        displayName: create report dir
+      - script: mkdir -p build/phpcs
+        displayName: create report dir
         
       - script: phpcs
         displayName: phpcs 
