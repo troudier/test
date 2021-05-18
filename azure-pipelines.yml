@@ -218,7 +218,7 @@ stages:
       - script: mkdir -p build/phpcs
         displayName: create report dir
         
-      - script: phpcs src >> build/phpcs/phpcs.txt
+      - script: phpcs >> build/phpcs/phpcs.txt
         displayName: phpcs 
         
       - task: PublishBuildArtifacts@1
@@ -256,19 +256,7 @@ stages:
         displayName: create report dir
         
       - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction >> build/php-cs-fixer/php-cs-fixer.txt
-        displayName: php-cs-fixer - txt 
-      
-      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --format=xml >> build/php-cs-fixer/php-cs-fixer.xml
-        condition: succeededOrFailed()
-        displayName: php-cs-fixer - report 
-      
-      - task: PublishTestResults@2
-        condition: succeededOrFailed()
-        inputs:
-          testResultsFormat: 'JUnit' 
-#   Options: JUnit, NUnit, VSTest, xUnit, cTest
-          testResultsFiles: build/php-cs-fixer/php-cs-fixer.xml
-          publishRunAttachments: true
+        displayName: php-cs-fixer 
         
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
