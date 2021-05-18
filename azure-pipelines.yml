@@ -259,6 +259,7 @@ stages:
         displayName: php-cs-fixer - txt 
       
       - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --format=xml >> build/php-cs-fixer/php-cs-fixer.xml
+        condition: succeededOrFailed()
         displayName: php-cs-fixer - report 
       
       - task: PublishTestResults@2
