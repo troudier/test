@@ -1,4 +1,3 @@
-  
 variables:
   phpVersion: 7.4
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
@@ -219,7 +218,7 @@ stages:
       - script: mkdir -p build/phpcs
         displayName: create report dir
         
-      - script: phpcs src >> build/phploc/phpcs.txt
+      - script: phpcs src >> build/phpcs/phpcs.txt
         displayName: phpcs 
         
       - task: PublishBuildArtifacts@1
@@ -256,8 +255,19 @@ stages:
       - script: mkdir -p build/php-cs-fixer
         displayName: create report dir
         
-      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --ansi >> build/php-cs-fixer/php-cs-fixer.txt
-        displayName: php-cs-fixer 
+      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction >> build/php-cs-fixer/php-cs-fixer.txt
+        displayName: php-cs-fixer - txt 
+      
+      - script: php-cs-fixer fix --verbose --dry-run --allow-risky=yes --no-interaction --format=xml >> build/php-cs-fixer/php-cs-fixer.xml
+        displayName: php-cs-fixer - report 
+      
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: 'JUnit' 
+#   Options: JUnit, NUnit, VSTest, xUnit, cTest
+          testResultsFiles: build/php-cs-fixer/php-cs-fixer.xml
+          publishRunAttachments: true
         
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifact
@@ -339,23 +349,6 @@ stages:
           PathtoPublish: build/phpcpd
           artifactName: phpcpdReport
 
-  - job: notify
-    dependsOn: [Phpmd,Phploc, PhpUnit]
-    condition: succeededOrFailed()
-    steps:
-    - task: EmailReport@1
-      inputs:
-        sendMailConditionConfig: 'Always'
-        subject: '[{environmentStatus}] {passPercentage} tests passed in $(Release.EnvironmentName) stage for $(Build.BuildNumber)'
-        defaultDomain: 'microsoft.com'
-        includeResultsStr: '1, 2'
-        groupTestResultsBy: 'run'
-        includeCommits: true
-        maxTestFailuresToShow: '15'
-        includeOthersInTotal: false
-        usePreviousEnvironment: false
-        smtpConnectionEndpoint: 'smtpforci'
-
 - stage: Package
   dependsOn: QA
   condition: and(succeeded(), eq(variables.hasDeploy, true))
@@ -385,7 +378,7 @@ stages:
       displayName: Publish Artifact
       inputs:
         PathtoPublish: $(build.artifactstagingdirectory)
-        artifactName: DemoArtifact
+        artifactName: $(build.Repository.Name)-build
   
     - script: echo Hi!
       
@@ -408,95 +401,3 @@ stages:
         echo Add other tasks to build, test, and deploy your project.
         echo See https://aka.ms/yaml
       displayName: 'Run a multi-line script'
-      
-      
-#- stage: Deploy
-#  dependsOn: [Package]
-#  condition: eq(variables.hasDeploy, true)
-#  jobs:
-#  - deployment: deployProd     
-#    condition: eq(variables.isMain, true)
-#    pool:
-#      vmImage: ubuntu-latest
-#    environment: prod
-#    strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#          - script: echo Hi!
-          
-#  - deployment: deployTest     
-#    condition: eq(variables.isMain, false)
-#    pool:
-#      vmImage: ubuntu-latest
-#    environment: test
-#    strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#          - script: echo Hi!
-#  - job: notify
-#    dependsOn: [deployProd, deployTest]
-#    steps:
-#    - script: echo notify
-#      displayName: send notification
-      
-#- stage: FTest
-#  dependsOn: [Deploy]
-#  condition: and(eq(variables.hasDeploy, true),eq(variables.isMain, false))
-#  jobs:
-#  - job: JmeterTest
-#    steps:
-#    - script: echo Hello, world!
-#      displayName: 'Run a one-line script'
-
-#    - script: |
-#        echo Add other tasks to build, test, and deploy your project.
-#        echo See https://aka.ms/yaml
-#      displayName: 'Run a multi-line script'
-      
-#  - job: SomeOtherTest
-#    steps:
-#    - script: echo Hello, world!
-#      displayName: 'Run a one-line script'
-
-#    - script: |
-#        echo Add other tasks to build, test, and deploy your project.
-#        echo See https://aka.ms/yaml
-#      displayName: 'Run a multi-line script'
-          
-#  - job: notify
-#    dependsOn: [JmeterTest, SomeOtherTest]
-#    steps:
-#    - script: echo notify
-#      displayName: send notification    
-            
-- stage: Document
-  dependsOn: [QA]
-  condition: eq(variables.hasDeploy, true)  
-  jobs:
-  - job: Phpdocumentor
-    container: jakzal/phpqa:latest
-    steps:
-    - task: Cache@2
-      inputs:
-        key: 'composer | "$(Agent.OS)" | composer.lock'
-        restoreKeys: |
-          composer | "$(Agent.OS)"
-          composer
-        path: $(COMPOSER_CACHE_DIR)
-      displayName: Cache composer
-      
-    - task: Cache@2
-      inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
-        restoreKeys: |
-          vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-          vendor | "$(Agent.OS)"
-          vendor
-        path: $(SYMFONY_VENDOR_DIR)
-      displayName: Cache vendors
-     
-      
-    #- script: phpDocumentor
-    #  displayName: phpDocumentor      
