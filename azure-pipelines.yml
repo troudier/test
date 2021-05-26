@@ -378,7 +378,7 @@ stages:
         rootFolder: $(System.DefaultWorkingDirectory)
         includeRootFolder: false
         archiveType: default
-        archiveFile: $(build.artifactstagingdirectory)/$(build.Repository.Name)-build
+        archiveFile: $(build.artifactstagingdirectory)
         replaceExistingArchive: true
         
     - script: ls -la $(build.artifactstagingdirectory)
@@ -391,7 +391,7 @@ stages:
       displayName: Publish Artifact
       inputs:
         PathtoPublish: $(build.artifactstagingdirectory)
-        artifactName: $(build.Repository.Name)-build
+        artifactName: demo-build
   
       
   - job: DockerPackage
