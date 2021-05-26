@@ -117,7 +117,8 @@ stages:
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: build/phpunit/coverage-cobertura.xml
-        publishRunAttachments: true
+        reportDirectory: build/phpunit/coverage
+        pathToSources: src/
       
   - job: Phpmd
     container: jakzal/phpqa:php$(phpVersion)
@@ -357,8 +358,11 @@ stages:
       displayName: Cache vendors
     
     - script: ls -la $(build.artifactstagingdirectory)
-      displayName: show dir
-    
+      displayName: show artifactstagingdirectory
+      
+    - script: ls -la $(System.DefaultWorkingDirectory)
+      displayName: show DefaultWorkingDirectory
+      
     - task: ArchiveFiles@1
       displayName: Archive files
       inputs:
