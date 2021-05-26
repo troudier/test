@@ -384,7 +384,7 @@ stages:
     - script: ls -la $(build.artifactstagingdirectory)
       displayName: show artifactstagingdirectory
       
-    - script: ls -la $(build.artifactstagingdirectory)/$(build.Repository.Name)-build
+    - script: ls -la $(build.artifactstagingdirectory)/troudier
       displayName: show artifactstagingdirectory with repositoryName
       
     - task: PublishBuildArtifacts@1
