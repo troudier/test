@@ -183,3 +183,9 @@ personne_organisation_parente:
   methods: [ 'GET' ]
   defaults:
     _controller: App\Controller\PersonneMoraleController::getOrganisationParente
+
+personnes_get_evenements:
+  path: /api/v1/evenements/personne/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\EvenementController::getPersonneEvenements

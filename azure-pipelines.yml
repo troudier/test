@@ -50,7 +50,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -89,7 +89,7 @@ stages:
       
     - task: Cache@2
       inputs:
-        key: 'vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"'
+        key: 'vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)" | composer.lock'
         restoreKeys: |
           vendor | "$(Agent.OS)" | phpUnit | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)" | phpUnit
@@ -134,7 +134,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -142,10 +142,10 @@ stages:
           path: $(SYMFONY_VENDOR_DIR)
         displayName: Cache vendors
      
-      - script: phpmd src text phpmd.xml --exclude 'tests/*,vendor/*' --reportfile build/phpmd/phpmd-report.txt --ignore-violations-on-exit
+      - script: phpmd src text phpmd.xml --exclude 'tests/*,vendor/*,src/Entity/*' --reportfile build/phpmd/phpmd-report.txt --ignore-violations-on-exit
         displayName: phpmd - text
         
-      - script: phpmd src xml phpmd.xml --exclude 'tests/*,vendor/*' --reportfile build/phpmd/phpmd-report.xml
+      - script: phpmd src xml phpmd.xml --exclude 'tests/*,vendor/*,src/Entity/*' --reportfile build/phpmd/phpmd-report.xml
         displayName: phpmd - report
         
         
@@ -171,7 +171,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -207,7 +207,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -244,7 +244,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -281,7 +281,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -317,7 +317,7 @@ stages:
           
       - task: Cache@2
         inputs:
-          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+          key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
           restoreKeys: |
             vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
             vendor | "$(Agent.OS)"
@@ -328,7 +328,7 @@ stages:
       - script: mkdir -p build/phpcpd
         displayName: create report dir
         
-      - script: phpcpd src >> build/phpcpd/phpcpd.txt
+      - script: phpcpd src --exclude src/Entity >> build/phpcpd/phpcpd.txt
         displayName: phpcpd 
         
       - task: PublishBuildArtifacts@1
@@ -348,7 +348,7 @@ stages:
     steps:
     - task: Cache@2
       inputs:
-        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"'
+        key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
         restoreKeys: |
           vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
           vendor | "$(Agent.OS)"
@@ -356,12 +356,17 @@ stages:
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
     
+    - script: ls -la $(build.artifactstagingdirectory)
+      displayName: show dir
+    
     - task: ArchiveFiles@1
       displayName: Archive files
       inputs:
         rootFolder: $(System.DefaultWorkingDirectory)
         includeRootFolder: false
-        archiveType: zip
+        archiveType: default
+        archiveFile: $(build.artifactstagingdirectory)/$(build.Repository.Name)-build
+        replaceExistingArchive: true
 
     - task: PublishBuildArtifacts@1
       displayName: Publish Artifact

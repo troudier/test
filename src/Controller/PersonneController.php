@@ -3,91 +3,100 @@
 namespace App\Controller;
 
 use App\Entity\PersonneLien;
-use App\Entity\PersonneMorale;
 use App\Entity\PersonnePhysique;
+use App\Repository\PersonneLienRepository;
+use App\Service\HelperService;
 use App\Service\Personne\PersonneService;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
 class PersonneController extends AbstractController
 {
-
     private $personneService;
 
-    public function __construct(PersonneService $personneService)
-    {
+    private $personneLienRepository;
+
+    private $helperService;
+
+    public function __construct(
+        PersonneService $personneService,
+        PersonneLienRepository $personneLienRepository,
+        HelperService $helperService
+    ) {
         $this->personneService = $personneService;
+        $this->personneLienRepository = $personneLienRepository;
+        $this->helperService = $helperService;
     }
 
     /**
-     * Endpoint pour la vue "cartes" du répertoire, renvoie une liste de personnes
+     * Endpoint pour la vue "cartes" du répertoire, renvoie une liste de personnes.
      *
-     * @param Request $request
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function liste(Request $request)
     {
-
-        $resultat = $this->personneService->prepareCartesRequete($request->query);
+        $resultat = $this->personneLienRepository->prepareCartesRequete($request->query);
         try {
             $resultat->execute();
+
             return new JsonResponse($resultat->fetchAllAssociative());
         } catch (\Doctrine\DBAL\Driver\Exception $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
-
         }
     }
 
     /**
-     * Endpoint pour la vue "fiche" du répertoire, renvoie les informations d'une personne
+     * Endpoint pour la vue "fiche" du répertoire, renvoie les informations d'une personne.
      *
      * @param $uuid
+     *
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function fiche($uuid)
     {
-        $resultat = $this->personneService->prepareFicheRequete($uuid);
+        $resultat = $this->personneLienRepository->prepareFicheRequete($uuid);
 
-            $resultat->execute();
-            $result = $resultat->fetchAssociative();
-            if ($result) {
-                $realUuid = $result['uuid'];
-                if ($result['type'] === 'lien') {
-                    $personneLien = $this->getDoctrine()->getRepository(PersonneLien::class)
+        $resultat->execute();
+        $result = $resultat->fetchAssociative();
+        if ($result) {
+            $realUuid = $result['uuid'];
+            if ('lien' === $result['type']) {
+                $personneLien = $this->getDoctrine()->getRepository(PersonneLien::class)
                         ->findBy(['personneMorale' => $result['pmId'], 'type' => 'morale']);
-                    $realUuid = $personneLien[0]->getUuid();
-                }
-                $resultatMemos = $this->personneService->getPersonneMemos($realUuid);
-                $resultatMemos->execute();
-                $memos = $resultatMemos->fetchAllAssociative();
-                $result['memos'] = $memos;
-                $resultatTags = $this->personneService->getPersonneTags($realUuid);
-                $resultatTags->execute();
-                $tags = $resultatTags->fetchAllAssociative();
-                $result['tags'] = $tags;
-                return new JsonResponse($result);
-            } else {
-                return new JsonResponse(['error' => 'Not Found'], 404);
+                $realUuid = $personneLien[0]->getUuid();
             }
+            $resultatMemos = $this->personneLienRepository->getPersonneMemos($realUuid);
+            $resultatMemos->execute();
+            $memos = $resultatMemos->fetchAllAssociative();
+            $result['memos'] = $memos;
+            $resultatTags = $this->personneLienRepository->getPersonneTags($realUuid);
+            $resultatTags->execute();
+            $tags = $resultatTags->fetchAllAssociative();
+            $result['tags'] = $tags;
 
+            return new JsonResponse($result);
+        } else {
+            return new JsonResponse(['error' => 'Not Found'], 404);
+        }
     }
 
     /**
-     * Rattache une liste de tags avec  une personneLien
+     * Rattache une liste de tags avec  une personneLien.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function insertTags(Request $request)
     {
         try {
-            $this->personneService->insertTags(json_decode($request->getContent(), TRUE));
+            $this->personneService->insertTags(json_decode($request->getContent(), true));
+
             return new JsonResponse(['content' => 'ok'], 201);
         } catch (Throwable $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
@@ -95,40 +104,43 @@ class PersonneController extends AbstractController
     }
 
     /**
-     * Endpoint récupérer la liste des liens d'une personne physique
+     * Endpoint récupérer la liste des liens d'une personne physique.
      *
      * @param $uuid
+     *
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function getLiens($uuid)
     {
-
-        $resultat = $this->personneService->prepareLiensRequete($uuid);
+        $resultat = $this->personneLienRepository->prepareLiensRequete($uuid);
         try {
             $resultat->execute();
+
             return new JsonResponse($resultat->fetchAllAssociative());
         } catch (\Doctrine\DBAL\Driver\Exception $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
-
         }
     }
 
     /**
-     * Endpoint récupérer la liste des champs custom d'une personne et de leurs valeurs
+     * Endpoint récupérer la liste des champs custom d'une personne et de leurs valeurs.
      *
      * @param $uuid
+     *
      * @return JsonResponse
+     *
      * @throws Throwable
      */
     public function getChamps($uuid)
     {
         try {
             $resultat = $this->personneService->getChamps($uuid);
+
             return new JsonResponse($resultat, 200);
         } catch (Throwable $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
-
         }
     }
 
@@ -151,6 +163,7 @@ class PersonneController extends AbstractController
                 $item['nom'] = $personne->getNom();
                 $result[] = $item;
             }
+
             return new JsonResponse($result, 200);
         } catch (Throwable $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
@@ -158,8 +171,7 @@ class PersonneController extends AbstractController
     }
 
     /**
-     * Permet de récupérer civilité / nom / prenom de l'utilisateur connecté
-     * @return JsonResponse
+     * Permet de récupérer civilité / nom / prenom de l'utilisateur connecté.
      */
     public function getPersonneCourante(): JsonResponse
     {
@@ -177,6 +189,7 @@ class PersonneController extends AbstractController
                 $donneesPersonne['nom'] = $current->getNom();
                 $donneesPersonne['prenom'] = $current->getPrenom();
             }
+
             return new JsonResponse($donneesPersonne, 200);
         } catch (\Doctrine\DBAL\Driver\Exception $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
@@ -184,114 +197,114 @@ class PersonneController extends AbstractController
     }
 
     /**
-     * Endpoint pour récupérer la liste  des statuts disponibles pour une personne (pp / pm / lien)
+     * Endpoint pour récupérer la liste  des statuts disponibles pour une personne (pp / pm / lien).
      *
-     * @param Request $request
      * @return JsonResponse
+     *
      * @throws Exception
      */
-    public function getStatuts(Request $request)
+    public function getStatuts()
     {
-
-        $resultat = $this->personneService->prepareListeStatuts($request->query);
+        $resultat = $this->personneLienRepository->prepareListeStatuts();
         try {
             $resultat->execute();
+
             return new JsonResponse($resultat->fetchAllAssociative());
         } catch (\Doctrine\DBAL\Driver\Exception $e) {
             return new JsonResponse(['error' => 'Internal Error'], 500);
-
         }
     }
 
-
     /**
-     * Mets à jour une personne physique
+     * Mets à jour une personne physique.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function update($uuid, Request $request)
     {
         try {
-            $update = $this->personneService->update(json_decode($request->getContent(), TRUE));
+            $update = $this->personneService->update(json_decode($request->getContent(), true));
             if (isset($update['erreur'])) {
                 return new JsonResponse($update, 400);
             }
-            return new JsonResponse(['content' => $update], 201);
+
+            return new JsonResponse(['content' => $update, 'uuid' => $uuid], 201);
         } catch (Throwable $e) {
             return new JsonResponse(['erreur' => 'Internal Error'], 500);
         }
     }
 
     /**
-     * Ajoute une personne physique
+     * Ajoute une personne physique.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function add(Request $request)
     {
-        try {
-            $create = $this->personneService->create(json_decode($request->getContent(), TRUE));
-            if (isset($create['erreur'])) {
-                return new JsonResponse($create, 400);
-            }
-            return new JsonResponse(['content' => $create], 201);
-        } catch (Throwable $e) {
-            return new JsonResponse(['erreur' => 'Internal Error'], 500);
+        $create = $this->personneService->create(json_decode($request->getContent(), true));
+        if (isset($create['erreur'])) {
+            return new JsonResponse($create, 400);
         }
+
+        return new JsonResponse(['content' => $create], 201);
     }
 
     /**
-     * Ajoute une personne fonction
+     * Ajoute une personne fonction.
      *
-     * @param Request $request
      * @return JsonResponse
      */
     public function addPersonneFonction(Request $request)
     {
+        $create = $this->personneService->createPersonneFonction(json_decode($request->getContent(), true));
+        if (isset($create['erreur'])) {
+            return new JsonResponse($create, 400);
+        }
 
-            $create = $this->personneService->createPersonneFonction(json_decode($request->getContent(), TRUE));
-            if (isset($create['erreur'])) {
-                return new JsonResponse($create, 400);
-            }
-            return new JsonResponse(['content' => $create], 201);
-
+        return new JsonResponse(['content' => $create], 201);
     }
 
     /**
-     * Endpoint pour récupérer le couple uuid / libelle  des personnes (pp / pm / lien) pour remplir un select
+     * Endpoint pour récupérer le couple uuid / libelle  des personnes (pp / pm / lien) pour remplir un select.
      *
      * @param  $type
+     *
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function getPersonnesSelect($type)
     {
         try {
-            $resultat = $this->personneService->preparePersonnesSelect($type);
+            $resultat = $this->helperService->preparePersonnesSelect($type);
             $resultat->execute();
+
             return new JsonResponse($resultat->fetchAllAssociative());
         } catch (Throwable $e) {
             var_dump($e->getMessage());
+
             return new JsonResponse(['error' => 'Internal Error'], 500);
         }
     }
 
     /**
-     * Endpoint pour récupérer le couple uuid / libelle  des fonctions pour les personnes "fonction",  pour remplir un select
+     * Endpoint pour récupérer le couple uuid / libelle  des fonctions pour les personnes "fonction",
+     * pour remplir un select.
      *
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function getPersonnesFonctions()
     {
         try {
-            $resultat = $this->personneService->preparePersonnesFonctions();
+            $resultat = $this->helperService->preparePersonnesFonctions();
             $resultat->execute();
+
             return new JsonResponse($resultat->fetchAllAssociative());
         } catch (Throwable $e) {
             var_dump($e->getMessage());
+
             return new JsonResponse(['error' => 'Internal Error'], 500);
         }
     }

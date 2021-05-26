@@ -2,17 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Model\Personne;
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -24,7 +22,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class PersonnePhysique extends Personne
 {
-
     /**
      * @var \Ramsey\Uuid\UuidInterface
      * @ApiProperty(identifier=true)
@@ -50,6 +47,7 @@ class PersonnePhysique extends Personne
 
     /**
      * One Product has One Shipment.
+     *
      * @Groups({"read", "write"})
      * @OneToOne(targetEntity="User")
      * @JoinColumn(name="user_id", referencedColumnName="id")
@@ -139,17 +137,11 @@ class PersonnePhysique extends Personne
         $this->uuid = $uuid ?: Uuid::uuid4();
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @param UuidInterface $uuid
-     */
     public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
@@ -410,5 +402,4 @@ class PersonnePhysique extends Personne
     {
         $this->infoCommerciale = $infoCommerciale;
     }
-
 }

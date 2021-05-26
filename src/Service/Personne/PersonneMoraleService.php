@@ -26,20 +26,13 @@ class PersonneMoraleService
         'telephone' => 'Tél.',
     ];
 
-    /**
-     * @var Connection
-     */
     private Connection $connexion;
 
     /**
-     *
      * @param EntityManagerInterface $em
      */
     private EntityManagerInterface $em;
 
-    /**
-     * @var TokenStorageInterface
-     */
     private TokenStorageInterface $tokenStorage;
 
     /**
@@ -47,23 +40,23 @@ class PersonneMoraleService
      */
     private array $civiliteMapping = [
         'M' => 'M',
-        'Mme' => 'Mme'
+        'Mme' => 'Mme',
     ];
 
     public function __construct(
         EntityManagerInterface $em,
         TokenStorageInterface $tokenStorage
-    )
-    {
+    ) {
         $this->em = $em;
         $this->connexion = $this->em->getConnection();
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
-     * Vérifie si les champs requis pour créer une personne physique sont présents
+     * Vérifie si les champs requis pour créer une personne physique sont présents.
      *
      * @param array $data
+     *
      * @return string[]
      */
     public function getChampsManquants($data)
@@ -78,10 +71,12 @@ class PersonneMoraleService
     }
 
     /**
-     * Crée une personne morale
+     * Crée une personne morale.
      *
      * @param $data
+     *
      * @return PersonneMorale
+     *
      * @throws \Exception
      */
     public function add($data)
@@ -105,47 +100,48 @@ class PersonneMoraleService
         $personne->setUserModification($this->tokenStorage->getToken()->getUser());
         //De base n'est pas lié à un user de l'application
         $this->em->persist($personne);
+
         return $personne;
     }
 
     /**
-     * Mise à jour d'une personne morale
+     * Mise à jour d'une personne morale.
      *
      * @param $data
      */
     public function update($lien, $data)
     {
         $personne = $lien->getPersonneMorale();
-        $personne->setRaisonSociale($data["personne"]["raisonSociale"]);
+        $personne->setRaisonSociale($data['personne']['raisonSociale']);
         $forme_juridique = $this->em->getRepository(FormeJuridique::class)
-            ->findBy(['uuid' => $data["personne"]["formeJuridique"]]);
+            ->findBy(['uuid' => $data['personne']['formeJuridique']]);
         if (isset($forme_juridique[0])) {
             $personne->setFormeJuridique($forme_juridique[0]);
         }
-        $personne->setSiret($data["personne"]["siret"]);
-        $personne->setCodeNaf($data["personne"]["codeNaf"]);
-        $personne->setCapital($data["personne"]["capital"]);
+        $personne->setSiret($data['personne']['siret']);
+        $personne->setCodeNaf($data['personne']['codeNaf']);
+        $personne->setCapital($data['personne']['capital']);
         $effectif = $this->em->getRepository(Effectif::class)
-            ->findBy(['uuid' => $data["personne"]["effectif"]]);
+            ->findBy(['uuid' => $data['personne']['effectif']]);
         if (isset($effectif[0])) {
             $personne->setEffectif($effectif[0]);
         }
         $chiffre_affaire = $this->em->getRepository(ChiffreAffaire::class)
-            ->findBy(['uuid' => $data["personne"]["chiffreAffaire"]]);
+            ->findBy(['uuid' => $data['personne']['chiffreAffaire']]);
         if (isset($chiffre_affaire[0])) {
             $personne->setChiffreAffaire($chiffre_affaire[0]);
         }
-        $personne->setParent($data["personne"]["organisationParente"]);
+        $personne->setParent($data['personne']['organisationParente']);
         $organisation_parente = $this->em->getRepository(PersonneMorale::class)
-            ->findBy(['uuid' => $data["personne"]["organisationParente"]]);
+            ->findBy(['uuid' => $data['personne']['organisationParente']]);
         if (isset($organisation_parente[0])) {
             $personne->setParent($organisation_parente[0]);
         }
-        if (isset($this->civiliteMapping[$data["personne"]["civilite"]])) {
-            $personne->setCivilite($this->civiliteMapping[$data["personne"]["civilite"]]);
+        if (isset($this->civiliteMapping[$data['personne']['civilite']])) {
+            $personne->setCivilite($this->civiliteMapping[$data['personne']['civilite']]);
         }
         $titre = $this->em->getRepository(Titre::class)
-            ->findBy(['libelle' => $data["personne"]["titre"]]);
+            ->findBy(['libelle' => $data['personne']['titre']]);
         if (isset($titre[0])) {
             $personne->setTitre($titre[0]->getLibelle());
         }
@@ -158,51 +154,54 @@ class PersonneMoraleService
     }
 
     /**
-     * Récupère les formes juridiques
+     * Récupère les formes juridiques.
      *
-     * @param $query
-     * @return \Doctrine\DBAL\Statement
      * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListeFormeJuridique($query): \Doctrine\DBAL\Statement
+    public function prepareListeFormeJuridique(): \Doctrine\DBAL\Statement
     {
         $sql = 'SELECT fjud_libelle as fjlib, fjud_uuid as uuid FROM forme_juridique';
+
         return $this->connexion->prepare($sql);
     }
 
     /**
-     * Récupère les effectifs
+     * Récupère les effectifs.
      *
-     * @param $query
-     * @return \Doctrine\DBAL\Statement
      * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListeEffectif($query): \Doctrine\DBAL\Statement
+    public function prepareListeEffectif(): \Doctrine\DBAL\Statement
     {
         $sql = 'SELECT eff_libelle as eff_lib, eff_uuid FROM effectif';
+
         return $this->connexion->prepare($sql);
     }
 
     /**
-     * Récupère les chiffres d'affaires
+     * Récupère les chiffres d'affaires.
      *
-     * @param $query
+     * @return \Doctrine\DBAL\Statement
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListeChiffreAffaire($query)
+    public function prepareListeChiffreAffaire()
     {
         $sql = 'SELECT ca_libelle as ca_lib, ca_uuid FROM chiffre_affaire';
+
         return $this->connexion->prepare($sql);
     }
 
     /**
-     * Récupère les personnes morales sans la PM courante
+     * Récupère les personnes morales sans la PM courante.
      *
-     * @param $query
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListeOrganisationParente($query): \Doctrine\DBAL\Statement
+    public function prepareListeOrganisationParente(): \Doctrine\DBAL\Statement
     {
-        $sql = 'SELECT pm_raison_sociale as organisation_lib, pm_uuid as organisation_uuid FROM personne_morale WHERE NOT pm_uuid="8e075fa1-fba2-4b57-8de1-78305f5d70b1"';
+        $sql = 'SELECT pm_raison_sociale as organisation_lib, pm_uuid as organisation_uuid 
+                FROM personne_morale 
+                WHERE NOT pm_uuid="8e075fa1-fba2-4b57-8de1-78305f5d70b1"';
+
         return $this->connexion->prepare($sql);
     }
-
 }

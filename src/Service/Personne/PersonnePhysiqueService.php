@@ -14,13 +14,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class PersonnePhysiqueService
 {
-
     public const CHAMPS_REQUIS = [
         'type' => 'Type',
         'civilite' => 'Civilité',
         'prenom' => 'Prénom',
         'nom' => 'Nom',
-        'visibilite' => 'Visibilité'
+        'visibilite' => 'Visibilité',
     ];
 
     public const CHAMPS_RECOMMANDE = [
@@ -34,7 +33,6 @@ class PersonnePhysiqueService
     private $connexion;
 
     /**
-     *
      * @param EntityManagerInterface $em
      */
     private $em;
@@ -43,24 +41,25 @@ class PersonnePhysiqueService
 
     private $civiliteMapping = [
         'M' => 'M',
-        'Mme' => 'Mme'
+        'Mme' => 'Mme',
     ];
 
     public function __construct(
         EntityManagerInterface $em,
         TokenStorageInterface $tokenStorage
-    )
-    {
+    ) {
         $this->em = $em;
         $this->connexion = $this->em->getConnection();
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
-     * Crée une personne physique
+     * Crée une personne physique.
      *
      * @param $data
+     *
      * @return PersonnePhysique
+     *
      * @throws \Exception
      */
     public function add($data)
@@ -73,7 +72,11 @@ class PersonnePhysiqueService
         $personne->setPrenom($data['personne']['prenom']);
         $personne->setNom($data['personne']['nom']);
         $personne->setCivilite($this->civiliteMapping[$data['personne']['civilite']]);
-        $personne->setInfoCommerciale($data['personne']['infoCommerciale']);
+        if (isset($data['personne']['infoCommerciale'])) {
+            $personne->setInfoCommerciale($data['personne']['infoCommerciale']);
+        } else {
+            $personne->setInfoCommerciale(false);
+        }
         //Autres champs
         $personne->setVisibilite($data['personne']['visibilite']);
         //Champs communs de logs
@@ -84,40 +87,41 @@ class PersonnePhysiqueService
         //De base n'est pas lié à un user de l'application
         $personne->setisUser(false);
         $this->em->persist($personne);
+
         return $personne;
     }
 
     /**
-     * Mise à jour d'une personne physique
+     * Mise à jour d'une personne physique.
      *
      * @param $data
      */
     public function update($lien, $data)
     {
         $personne = $lien->getPersonnePhysique();
-        $personne->setPrenom($data["personne"]["prenom"]);
-        $personne->setNom($data["personne"]["nom"]);
-        if (isset($data["personne"]["infoCommerciale"])) {
-            $personne->setInfoCommerciale($data["personne"]["infoCommerciale"]);
+        $personne->setPrenom($data['personne']['prenom']);
+        $personne->setNom($data['personne']['nom']);
+        if (isset($data['personne']['infoCommerciale'])) {
+            $personne->setInfoCommerciale($data['personne']['infoCommerciale']);
         }
-        if (isset($this->civiliteMapping[$data["personne"]["civilite"]])) {
-            $personne->setCivilite($this->civiliteMapping[$data["personne"]["civilite"]]);
+        if (isset($this->civiliteMapping[$data['personne']['civilite']])) {
+            $personne->setCivilite($this->civiliteMapping[$data['personne']['civilite']]);
         }
         $titre = $this->em->getRepository(Titre::class)
-            ->findBy(['libelle' => $data["personne"]["titre"]]);
+            ->findBy(['libelle' => $data['personne']['titre']]);
         if (isset($titre[0])) {
             $personne->setTitre($titre[0]->getLibelle());
         }
-        if (isset($data["personne"]["apporteur"])) {
+        if (isset($data['personne']['apporteur'])) {
             $apporteur = $this->em->getRepository(PersonnePhysique::class)
-                ->findBy(['uuid' => $data["personne"]["apporteur"]]);
+                ->findBy(['uuid' => $data['personne']['apporteur']]);
             $personne->setApporteur($apporteur[0]);
         } else {
             $personne->setApporteur(null);
         }
-        if (isset($data["personne"]["origine"])) {
+        if (isset($data['personne']['origine'])) {
             $origine = $this->em->getRepository(Origine::class)
-                ->findBy(['uuid' => $data["personne"]["origine"]]);
+                ->findBy(['uuid' => $data['personne']['origine']]);
             $personne->setOrigine($origine[0]);
         } else {
             $personne->setOrigine(null);
@@ -131,13 +135,13 @@ class PersonnePhysiqueService
     }
 
     /**
-     * Création d'un lien intervenant entre une entité personne et un user
+     * Création d'un lien intervenant entre une entité personne et un user.
      *
      * @param $lien
      * @param $user
      * @param $type
-     * @throws \Exception
      *
+     * @throws \Exception
      */
     public function addIntervenant($lien, $user, $type)
     {
@@ -162,9 +166,10 @@ class PersonnePhysiqueService
     }
 
     /**
-     * Vérifie si les champs requis pour créer une personne physique sont présents
+     * Vérifie si les champs requis pour créer une personne physique sont présents.
      *
      * @param array $data
+     *
      * @return string[]
      */
     public function getChampsManquants($data)
@@ -179,13 +184,13 @@ class PersonnePhysiqueService
     }
 
     /**
-     * Récupère les origines disponibles, filtrés  ou non (si systeme ou non)
+     * Récupère les origines disponibles, filtrés  ou non (si systeme ou non).
      *
-     * @param $query
      * @return \Doctrine\DBAL\Statement
+     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListePersonnesPhysiques($query)
+    public function prepareListePersonnesPhysiques()
     {
         $sql = 'SELECT  
                     pp_civilite as civilite,
@@ -193,24 +198,25 @@ class PersonnePhysiqueService
                     pp_nom as nom,
                     pp_prenom as prenom
                  FROM personne_physique ';
+
         return $this->connexion->prepare($sql);
     }
 
     /**
-     * Récupère les titres disponibles
+     * Récupère les titres disponibles.
      *
-     * @param $query
      * @return \Doctrine\DBAL\Statement
+     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function prepareListeTitres($query)
+    public function prepareListeTitres()
     {
         $sql = 'SELECT  
                     titre_civilite as civilite,
                     titre_uuid as uuid,
                     titre_libelle as libelle
                  FROM titre ';
+
         return $this->connexion->prepare($sql);
     }
-
 }

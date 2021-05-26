@@ -3,23 +3,15 @@
 namespace App\Service;
 
 use App\Entity\Adresse;
-use App\Entity\Champ;
 use App\Entity\LienAdresse;
-use App\Entity\LienMail;
-use App\Entity\LienSite;
-use App\Entity\LienTelephone;
 use App\Entity\PersonneLien;
-use App\Entity\Site;
 use DateTime;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AdresseService
 {
-
     public array $typeMapping = [
         '-1' => 'OUTPUT',
         '0' => 'NPAI',
@@ -31,25 +23,19 @@ class AdresseService
 
     private TokenStorageInterface $tokenStorage;
 
-    /**
-     *
-     * @param EntityManagerInterface $em
-     */
     public function __construct(
         EntityManagerInterface $em,
         TokenStorageInterface $tokenStorage
-
-    )
-    {
+    ) {
         $this->em = $em;
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
-     * Créé une Adresse
+     * Créé une Adresse.
      *
      * @param $email
-     * @return Adresse
+     *
      * @throws \Exception
      */
     private function createAdresse($data): Adresse
@@ -69,17 +55,19 @@ class AdresseService
         $adresse->setDateModification(new DateTime());
         $adresse->setUserModification($this->tokenStorage->getToken()->getUser());
         $this->em->persist($adresse);
+
         return $adresse;
     }
 
     /**
-     * Ajoute une adresse en relation avec une personne lien
+     * Ajoute une adresse en relation avec une personne lien.
      *
      * @param $uuid
      * @param $email
+     *
      * @throws \Exception
      */
-    public function add($uuid, $adresse, $type = "1", $principal = false)
+    public function add($uuid, $adresse, $type = '1', $principal = false)
     {
         $personneLien = $this->em->getRepository(PersonneLien::class)
             ->findBy(['uuid' => $uuid]);
@@ -88,15 +76,16 @@ class AdresseService
         $lien->setAdresse($this->createAdresse($adresse));
         $lien->setLien($personneLien[0]);
         $lien->setPrincipal($principal);
-        $lien->setType((int)$type);
+        $lien->setType((int) $type);
         $this->em->persist($lien);
         $this->em->flush();
     }
 
     /**
-     * Récupère la liste des adresses d'une PersonneLien
+     * Récupère la liste des adresses d'une PersonneLien.
      *
      * @param $uuid
+     *
      * @return array
      */
     public function getAdresses($uuid)
@@ -125,14 +114,16 @@ class AdresseService
                 $adresses[] = $data;
             }
         }
+
         return $adresses;
     }
 
     /**
-     * Met à jour la liste des adresses d'une PersonneLien
+     * Met à jour la liste des adresses d'une PersonneLien.
      *
      * @param $lien
      * @param $data
+     *
      * @throws \Exception
      */
     public function updatePersonneAdresses($lien, $data)
@@ -145,7 +136,7 @@ class AdresseService
             foreach ($data as $id => $item) {
                 if ($item['uuid'] === $lienAdresse->getUuid()->toString()) {
                     $existe = true;
-                    $lienAdresse->setPrincipal((bool)$item['principal']);
+                    $lienAdresse->setPrincipal((bool) $item['principal']);
                     $lienAdresse->setType($this->getTypeId($item['type']));
                     $this->updateAdresse($lienAdresse->getAdresse(), $item);
                     $this->em->persist($lienAdresse);
@@ -170,7 +161,7 @@ class AdresseService
     }
 
     /**
-     * Récupère la liste des types disponibles pour les adresses
+     * Récupère la liste des types disponibles pour les adresses.
      *
      * @return array
      */
@@ -180,15 +171,14 @@ class AdresseService
         foreach ($this->typeMapping as $id => $item) {
             $data['adresses'][] = ['id' => $id, 'text' => $item];
         }
+
         return $data;
     }
 
     /**
-     *
-     * Retourne l'id d'un type d'une adresse depuis son libellé
+     * Retourne l'id d'un type d'une adresse depuis son libellé.
      *
      * @param $type
-     * @return string
      */
     private function getTypeId($type): string
     {
@@ -202,46 +192,47 @@ class AdresseService
     }
 
     /**
-     * Met à jour une adresse
+     * Met à jour une adresse.
      *
      * @param Adresse $adresse
      * @param $data
      */
-    private function updateAdresse($adresse, $data){
+    private function updateAdresse($adresse, $data)
+    {
         $modifie = false;
-        if($adresse->getLigne1() !== $data['ligne1']){
+        if ($adresse->getLigne1() !== $data['ligne1']) {
             $modifie = true;
             $adresse->setLigne1($data['ligne1']);
         }
-        if($adresse->getLigne2() !== $data['ligne2']){
+        if ($adresse->getLigne2() !== $data['ligne2']) {
             $modifie = true;
             $adresse->setLigne2($data['ligne2']);
         }
-        if($adresse->getLigne3() !== $data['ligne3']){
+        if ($adresse->getLigne3() !== $data['ligne3']) {
             $modifie = true;
             $adresse->setLigne3($data['ligne3']);
         }
-        if($adresse->getCp() !== $data['cp']){
+        if ($adresse->getCp() !== $data['cp']) {
             $modifie = true;
             $adresse->setCp($data['cp']);
         }
-        if($adresse->getVille() !== $data['ville']){
+        if ($adresse->getVille() !== $data['ville']) {
             $modifie = true;
             $adresse->setVille($data['ville']);
         }
-        if($adresse->getPays() !== $data['pays']){
+        if ($adresse->getPays() !== $data['pays']) {
             $modifie = true;
             $adresse->setPays($data['pays']);
         }
-        if($adresse->getCedexCode() !== $data['cedexCode']){
+        if ($adresse->getCedexCode() !== $data['cedexCode']) {
             $modifie = true;
             $adresse->setCedexCode($data['cedexCode']);
         }
-        if($adresse->getCedexLibelle() !== $data['cedexLibelle']){
+        if ($adresse->getCedexLibelle() !== $data['cedexLibelle']) {
             $modifie = true;
             $adresse->setCedexLibelle($data['cedexLibelle']);
         }
-        if($modifie){
+        if ($modifie) {
             $adresse->setDateModification(new DateTime());
             $adresse->setUserModification($this->tokenStorage->getToken()->getUser());
             $this->em->persist($adresse);

@@ -1,16 +1,14 @@
 <?php
+
 namespace App\Identifier;
 
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Normalizer for Uuid
- *
+ * Normalizer for Uuid.
  */
 class UpsellUuidNormalizer implements DenormalizerInterface
 {
@@ -41,9 +39,7 @@ class UpsellUuidNormalizer implements DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-
-
-        return (Uuid::class === $type || UuidInterface::class === $type);
+        return Uuid::class === $type || UuidInterface::class === $type;
     }
 
     /**
@@ -51,7 +47,7 @@ class UpsellUuidNormalizer implements DenormalizerInterface
      */
     private function isValid($data): bool
     {
-        return $data === null
+        return null === $data
             || (is_string($data) && Uuid::isValid($data));
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -19,7 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class IndicatifTelephone
 {
-
     /**
      * @var \Ramsey\Uuid\UuidInterface
      * @ApiProperty(identifier=true)
@@ -66,17 +65,11 @@ class IndicatifTelephone
         $this->uuid = $uuid ?: Uuid::uuid4();
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @param UuidInterface $uuid
-     */
     public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
@@ -161,5 +154,4 @@ class IndicatifTelephone
     {
         $this->codePays = $codePays;
     }
-
 }

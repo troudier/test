@@ -12,12 +12,12 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20210402124346 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return '';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE personne_physique ADD apporteur_id INT DEFAULT NULL');
@@ -25,7 +25,7 @@ final class Version20210402124346 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_5C2B29A284FC98A0 ON personne_physique (apporteur_id)');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE personne_physique DROP FOREIGN KEY FK_5C2B29A284FC98A0');

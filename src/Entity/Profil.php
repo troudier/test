@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -21,8 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Profil
 {
-
-
     /**
      * @var \Ramsey\Uuid\UuidInterface
      * @ApiProperty(identifier=true)
@@ -39,7 +35,6 @@ class Profil
      * @ORM\Column(name="id", type="integer")
      */
     private $id;
-
 
     /**
      * @Groups({"read", "write"})
@@ -88,17 +83,11 @@ class Profil
         $this->uuid = $uuid ?: Uuid::uuid4();
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @param UuidInterface $uuid
-     */
     public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
@@ -151,8 +140,6 @@ class Profil
     {
         $this->systeme = $systeme;
     }
-
-
 
     /**
      * @return mixed
@@ -233,5 +220,4 @@ class Profil
     {
         $this->userModification = $userModification;
     }
-
 }

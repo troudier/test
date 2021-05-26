@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
@@ -22,7 +22,6 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
  */
 class User implements UserInterface
 {
-
     /**
      * @var UuidInterface
      * @ApiProperty(identifier=true)
@@ -47,6 +46,7 @@ class User implements UserInterface
     /**
      * @SerializedName("password")
      * @Groups({"write"})
+     *
      * @var string The plain password
      * @ORM\Column(name="user_plain_password", type="string", nullable=true)
      */
@@ -152,7 +152,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string)$this->login;
+        return (string) $this->login;
     }
 
     public function setUsername(string $username): self
@@ -186,7 +186,7 @@ class User implements UserInterface
      */
     public function getPassword(): string
     {
-        return (string)$this->password;
+        return (string) $this->password;
     }
 
     public function setPassword(string $password): self
@@ -227,17 +227,11 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @param UuidInterface $uuid
-     */
     public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
@@ -379,9 +373,6 @@ class User implements UserInterface
         return $this->plainPassword;
     }
 
-    /**
-     * @param string $plainPassword
-     */
     public function setPlainPassword(string $plainPassword): void
     {
         $this->plainPassword = $plainPassword;
@@ -450,5 +441,4 @@ class User implements UserInterface
     {
         $this->leadIntervenants = $leadIntervenants;
     }
-
 }

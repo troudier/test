@@ -1,6 +1,9 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\DataBase;
+
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
@@ -17,6 +20,7 @@ final class MultiDbConnectionWrapper extends Connection
     ) {
         parent::__construct($params, $driver, $config, $eventManager);
     }
+
     public function selectDatabase(string $data): void
     {
         if ($this->isConnected()) {

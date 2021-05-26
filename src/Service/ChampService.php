@@ -8,34 +8,33 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ChampService
 {
-
     private $targetMapping = [
         1 => [
-            'morale'
+            'morale',
         ],
         2 => [
-            'physique'
+            'physique',
         ],
         3 => [
             'morale',
-            'physique'
+            'physique',
         ],
         4 => [
-            'lien'
+            'lien',
         ],
         5 => [
             'morale',
-            'lien'
+            'lien',
         ],
         6 => [
             'physique',
-            'lien'
+            'lien',
         ],
         7 => [
             'physique',
             'lien',
-            'morale'
-        ]
+            'morale',
+        ],
     ];
 
     private $typeMapping = [
@@ -46,18 +45,13 @@ class ChampService
         21 => 'radio',
         22 => 'checkbox',
         30 => 'textarea',
-        40 => 'date'
+        40 => 'date',
     ];
 
     /**
      * @var Connection
      */
     private $connexion;
-
-    /**
-     *
-     * @param EntityManagerInterface $em
-     */
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -91,7 +85,7 @@ class ChampService
                 $data[] = $item;
             }
         }
+
         return $data;
     }
-
 }

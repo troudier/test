@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -21,7 +19,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Evenement
 {
-
     /**
      * @var \Ramsey\Uuid\UuidInterface
      * @ApiProperty(identifier=true)
@@ -43,7 +40,7 @@ class Evenement
      * @Groups({"read", "write"})
      * @ORM\Column(name="ev_type", type="integer")
      */
-    private $visibilite;
+    private $type;
 
     /**
      * @Groups({"read", "write"})
@@ -65,13 +62,13 @@ class Evenement
 
     /**
      * @Groups({"read", "write"})
-     * @ORM\Column(name="ev_date_echeance", type="datetime")
+     * @ORM\Column(name="ev_date_echeance", type="datetime", nullable=true)
      */
     private $dateEcheance;
 
     /**
      * @Groups({"read", "write"})
-     * @ORM\Column(name="ev_date_fait", type="datetime")
+     * @ORM\Column(name="ev_date_fait", type="datetime", nullable=true)
      */
     private $dateFait;
 
@@ -122,17 +119,11 @@ class Evenement
         $this->uuid = $uuid ?: Uuid::uuid4();
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @param UuidInterface $uuid
-     */
     public function setUuid(UuidInterface $uuid): void
     {
         $this->uuid = $uuid;
@@ -157,17 +148,17 @@ class Evenement
     /**
      * @return mixed
      */
-    public function getVisibilite()
+    public function getType()
     {
-        return $this->visibilite;
+        return $this->type;
     }
 
     /**
-     * @param mixed $visibilite
+     * @param mixed $type
      */
-    public function setVisibilite($visibilite): void
+    public function setType($type): void
     {
-        $this->visibilite = $visibilite;
+        $this->type = $type;
     }
 
     /**
@@ -361,5 +352,4 @@ class Evenement
     {
         $this->userModification = $userModification;
     }
-
 }

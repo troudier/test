@@ -9,27 +9,19 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TagService
 {
-
     /**
-     *
      * @var string[]
      */
-
     private $targetMapping = [
         'personnes' => '1',
         'leads' => '2',
-        'all' => '3'
+        'all' => '3',
     ];
 
     /**
      * @var Connection
      */
     private $connexion;
-
-    /**
-     *
-     * @param EntityManagerInterface $em
-     */
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -38,10 +30,12 @@ class TagService
     }
 
     /**
-     * Récupère les tags disponibles, filtrés  ou non (par target et / ou si systeme ou non)
+     * Récupère les tags disponibles, filtrés  ou non (par target et / ou si systeme ou non).
      *
      * @param $query
+     *
      * @return \Doctrine\DBAL\Statement
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function prepareListeTags($query)
@@ -53,30 +47,30 @@ class TagService
                  FROM tag ';
         $sqlPart = '';
         if ($query->has('target')) {
-            $sqlPart = empty($sqlPart) ? "WHERE (" : $sqlPart . "AND (";
-            $sqlPart .= 'tag.tag_target = ' . $this->targetMapping[addslashes($query->get('target'))] . ') ';
+            $sqlPart = empty($sqlPart) ? 'WHERE (' : $sqlPart.'AND (';
+            $sqlPart .= 'tag.tag_target = '.$this->targetMapping[addslashes($query->get('target'))].') ';
         }
         if ($query->has('systeme')) {
-            $sqlPart = empty($sqlPart) ? "WHERE (" : $sqlPart . "AND (";
-            $sqlPart .= 'tag.tag_systeme = ' . addslashes($query->get('systeme')) . ') ';
+            $sqlPart = empty($sqlPart) ? 'WHERE (' : $sqlPart.'AND (';
+            $sqlPart .= 'tag.tag_systeme = '.addslashes($query->get('systeme')).') ';
         }
-        return $this->connexion->prepare($sql . $sqlPart);
+
+        return $this->connexion->prepare($sql.$sqlPart);
     }
 
     /**
-     * Vérifie si un Tag est lié à une PersonneLien
+     * Vérifie si un Tag est lié à une PersonneLien.
      *
-     * @param PersonneLien $lien
-     * @param Tag $tag
      * @return bool
      */
-    public function hasTag(PersonneLien  $lien,Tag $tag){
-        foreach($lien->getTags() as $item){
-            if($tag === $item){
+    public function hasTag(PersonneLien $lien, Tag $tag)
+    {
+        foreach ($lien->getTags() as $item) {
+            if ($tag === $item) {
                 return true;
             }
         }
+
         return false;
     }
-
 }

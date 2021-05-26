@@ -2,28 +2,25 @@
 
 namespace App\Service;
 
-use DateTime;
 use App\Entity\Memo;
 use App\Entity\PersonneLien;
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MemoService
 {
-
     /**
      * @var Connection
      */
     private $connexion;
 
     /**
-     *
      * @param EntityManagerInterface $em
      */
     private $em;
     /**
-     *
      * @param TokenStorageInterface $tokenStorage
      */
     private $tokenStorage;
@@ -31,23 +28,21 @@ class MemoService
     public function __construct(
         EntityManagerInterface $em,
         TokenStorageInterface $tokenStorage
-    )
-    {
+    ) {
         $this->em = $em;
         $this->connexion = $this->em->getConnection();
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
-     * Ajoute un mémo en relation avec une personne lien
+     * Ajoute un mémo en relation avec une personne lien.
      *
      * @param $query
-     * @return Memo
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function add($data): Memo
     {
-
         $memo = new Memo();
         $memo->setTexte(addslashes($data['texte']));
         $memo->setDateCreation(new DateTime());
@@ -63,12 +58,14 @@ class MemoService
             $this->em->persist($memo);
             $this->em->flush();
         }
+
         return $memo;
     }
 
     /**
      * @param PersonneLien $lien
-     * @param array $memosJson
+     * @param array        $memosJson
+     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function update($lien, $memosJson)
@@ -80,23 +77,20 @@ class MemoService
         foreach ($memosJson as $item) {
             $found = false;
             foreach ($memos as $memo) {
-
-                if ($item['uuid'] === $memo->getUuid()->toString()){
-
+                if ($item['uuid'] === $memo->getUuid()->toString()) {
                     $found = true;
                 }
             }
-            if(!$found){
+            if (!$found) {
                 $nouveaux[] = $item['texte'];
             }
         }
-        foreach($nouveaux as $texte){
+        foreach ($nouveaux as $texte) {
             $this->add([
                 'uuid' => $lien->getUuid()->toString(),
                 'texte' => $texte,
-                'persist' => true
+                'persist' => true,
                 ]);
         }
     }
-
 }
