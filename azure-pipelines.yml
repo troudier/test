@@ -378,7 +378,7 @@ stages:
         rootFolder: $(System.DefaultWorkingDirectory)
         includeRootFolder: false
         archiveType: default
-        archiveFile: $(build.artifactstagingdirectory)
+        archiveFile: demo-build
         replaceExistingArchive: true
         
     - script: ls -la $(build.artifactstagingdirectory)
