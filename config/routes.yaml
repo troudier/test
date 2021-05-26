@@ -1,3 +1,8 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+authentication_token:
+  path: /authentication_token
+  methods: ['POST']
+
+refresh_token:
+  path:       /token/refresh
+  controller: gesdinet.jwtrefreshtoken::refresh
+

@@ -1,0 +1,60 @@
+segments_liste:
+  path: /api/v1/segments
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::liste
+
+
+segments_fiche:
+  path: /api/v1/segments/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::fiche
+
+segments_fiche_resultats:
+  path: /api/v1/segments/resultats/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::resultats
+
+segments_fiche_nb_contacts:
+  path: /api/v1/segments/count/{uuid}/{index}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::nbContacts
+
+segments_fiche_liste_nb_contacts:
+  path: /api/v1/segments/count-list/{uuid}
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::listeNbContacts
+
+segments_champs_liste:
+  path: /api/v1/segments-champs
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::getChamps
+
+segments_operateurs_liste:
+  path: /api/v1/segments-operateurs
+  methods: ['GET']
+  defaults:
+    _controller: App\Controller\SegmentController::getOperateurs
+
+segment_update:
+  path: /api/v1/segments/{uuid}
+  methods: ['PUT']
+  defaults:
+    _controller: App\Controller\SegmentController::update
+
+segment_calculer:
+  path: /api/v1/segments/calculer/{uuid}
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\SegmentController::calculer
+
+segment_live_resultats:
+  path: /api/v1/segments/live-resultats/{uuid}
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\SegmentController::liveResultats

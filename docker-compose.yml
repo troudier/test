@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+
+    maildev:
+        image: maildev/maildev
+        container_name: maildev_docker_symfony
+        command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+        ports:
+          - "8084:80"
+        restart: always
+
+    www:
+        build: php
+        container_name: www_docker_symfony_api
+        ports:
+          - "8083:80"
+        volumes:
+            - ./php/vhosts:/etc/apache2/sites-enabled
+            - ./:/var/www
+        restart: always
+
+networks:
+    default:
+        external:
+            name: dev

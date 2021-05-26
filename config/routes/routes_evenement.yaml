@@ -1,0 +1,5 @@
+evenement_ajout:
+  path: /api/v1/evenements
+  methods: ['POST']
+  defaults:
+    _controller: App\Controller\EvenementController::add
