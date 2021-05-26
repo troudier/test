@@ -378,14 +378,12 @@ stages:
         rootFolder: $(System.DefaultWorkingDirectory)
         includeRootFolder: false
         archiveType: default
-        archiveFile: demo-build.zip
+        archiveFile: $(build.artifactstagingdirectory)/demo-build.zip
         replaceExistingArchive: true
         
     - script: ls -la $(build.artifactstagingdirectory)
       displayName: show artifactstagingdirectory
       
-    - script: ls -la $(build.artifactstagingdirectory)/troudier
-      displayName: show artifactstagingdirectory with repositoryName
       
     - task: PublishBuildArtifacts@1
       displayName: Publish Artifact
