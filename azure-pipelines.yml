@@ -345,7 +345,7 @@ stages:
 
 - stage: Package
   dependsOn: [ 'Prepare', 'QA' ]
-  condition: and(succeeded(), eq(variables.hasDeploy, true))
+  condition: and(or(and(succeeded('Prepare'), succeeded('QA'), eq(variables.isProduction, false)), and(succeeded('Prepare'), skipped('QA'), eq(variables.isProduction, true))), eq(variables.hasDeploy, true))
   jobs:
   
   
@@ -401,12 +401,3 @@ stages:
             includeLatestTag: true
 
       
-#  - job: HelmPackage
-#    steps:
-#    - script: echo Hello, world!
-#      displayName: 'Run a one-line script'
-#
-#    - script: |
-#        echo Add other tasks to build, test, and deploy your project.
-#        echo See https://aka.ms/yaml
-#      displayName: 'Run a multi-line script'
