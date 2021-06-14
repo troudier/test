@@ -391,14 +391,28 @@ stages:
             path: $(SYMFONY_VENDOR_DIR)
           displayName: Cache vendors
 
-        - task: DockerCompose@0
-          condition: eq(variables.isProduction, true)
+#        - task: DockerCompose@0
+#          condition: eq(variables.isProduction, true)
+#          inputs:
+#            containerregistrytype: 'Container Registry'
+#            dockerRegistryEndpoint: 'scaleway container registry'
+#            dockerComposeFile: 'docker-compose.production.yml'
+#            action: 'Build services'
+#            includeSourceTags: true
+#            includeLatestTag: true
+            
+                        
+        - task: Docker@2
           inputs:
-            containerregistrytype: 'Container Registry'
-            dockerRegistryEndpoint: 'scaleway container registry'
-            dockerComposeFile: 'docker-compose.production.yml'
-            action: 'Build services'
-            includeSourceTags: true
-            includeLatestTag: true
+            containerRegistry: 'scaleway container registry'
+            repository: 'azko-upsell/crm-test'
+            command: 'buildAndPush'
+            Dockerfile: './docker/Dockerfile'
+            buildContext: '.'
+            tags: |
+              $(Build.BuildId)
+              preprod-latest
+
+
 
       
