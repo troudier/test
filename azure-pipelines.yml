@@ -345,8 +345,9 @@ stages:
 
 - stage: Package
   dependsOn: [ 'Prepare', 'QA' ]
-  condition: and(or(and(succeeded('Prepare'), succeeded('QA'), eq(variables.isProduction, false)), and(succeeded('Prepare'), skipped('QA'), eq(variables.isProduction, true))), eq(variables.hasDeploy, true))
+  condition: and(or(and(succeeded('Prepare'), succeeded('QA'), eq(variables.isProduction, false)), and(succeeded('Prepare'), eq(variables['Agent.JobStatus'], 'Skipped'), eq(variables.isProduction, true))), eq(variables.hasDeploy, true))
   jobs:
+#  eq(stageDependencies.A.A1.result,'Skipped')
   
   
   - job: ZipPackage
