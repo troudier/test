@@ -29,3 +29,15 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\OpenApi\JwtDecorator:
+        decorates: 'api_platform.swagger.normalizer.documentation'
+        arguments: [ '@App\OpenApi\JwtDecorator.inner' ]
+        autoconfigure: false
+    App\Identifier\UpsellUuidNormalizer:
+        tags:
+            - { name: api_platform.identifier.denormalizer }
+    App\EventListener\JWTDecodedListener:
+        arguments:
+            - '%env(DB_URL_ENCODE_KEY)%'
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_decoded, method: onJWTDecoded }

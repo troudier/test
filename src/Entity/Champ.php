@@ -1,0 +1,289 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+/**
+ * @ApiResource(
+ *     normalizationContext={"groups"={"read"}},
+ *     denormalizationContext={"groups"={"write"}}
+ * )
+ * @ORM\Entity
+ */
+class Champ
+{
+    /**
+     * @var \Ramsey\Uuid\UuidInterface
+     * @ApiProperty(identifier=true)
+     * @ORM\Column(name="ch_uuid", type="uuid", unique=true)
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
+     */
+    public $uuid;
+
+    /**
+     * @ORM\Id
+     * @ApiProperty(identifier=false)
+     * @ORM\GeneratedValue
+     * @ORM\Column(name="id", type="integer")
+     */
+    private $id;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_libelle", type="string", length=255)
+     */
+    private $libelle;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_target", type="integer")
+     */
+    private $target;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_type", type="integer")
+     */
+    private $type;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_valeurs", type="text")
+     */
+    private $valeurs;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_required", type="boolean")
+     */
+    private $required;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\OneToMany(targetEntity="App\Entity\LienChamp", mappedBy="champ")
+     */
+    private $liens;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_crea_date", type="datetime")
+     */
+    private $dateCreation;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(name="ch_modif_date", type="datetime")
+     */
+    private $dateModification;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     */
+    private $userCreation;
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     */
+    private $userModification;
+
+    public function __construct(UuidInterface $uuid = null)
+    {
+        $this->uuid = $uuid ?: Uuid::uuid4();
+    }
+
+    public function getUuid(): UuidInterface
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(UuidInterface $uuid): void
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLibelle()
+    {
+        return $this->libelle;
+    }
+
+    /**
+     * @param mixed $libelle
+     */
+    public function setLibelle($libelle): void
+    {
+        $this->libelle = $libelle;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * @param mixed $target
+     */
+    public function setTarget($target): void
+    {
+        $this->target = $target;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValeurs()
+    {
+        return $this->valeurs;
+    }
+
+    /**
+     * @param mixed $valeurs
+     */
+    public function setValeurs($valeurs): void
+    {
+        $this->valeurs = $valeurs;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequired()
+    {
+        return $this->required;
+    }
+
+    /**
+     * @param mixed $required
+     */
+    public function setRequired($required): void
+    {
+        $this->required = $required;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLiens()
+    {
+        return $this->liens;
+    }
+
+    /**
+     * @param mixed $liens
+     */
+    public function setLiens($liens): void
+    {
+        $this->liens = $liens;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateCreation()
+    {
+        return $this->dateCreation;
+    }
+
+    /**
+     * @param mixed $dateCreation
+     */
+    public function setDateCreation($dateCreation): void
+    {
+        $this->dateCreation = $dateCreation;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateModification()
+    {
+        return $this->dateModification;
+    }
+
+    /**
+     * @param mixed $dateModification
+     */
+    public function setDateModification($dateModification): void
+    {
+        $this->dateModification = $dateModification;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserCreation()
+    {
+        return $this->userCreation;
+    }
+
+    /**
+     * @param mixed $userCreation
+     */
+    public function setUserCreation($userCreation): void
+    {
+        $this->userCreation = $userCreation;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserModification()
+    {
+        return $this->userModification;
+    }
+
+    /**
+     * @param mixed $userModification
+     */
+    public function setUserModification($userModification): void
+    {
+        $this->userModification = $userModification;
+    }
+}
