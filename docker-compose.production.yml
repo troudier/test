@@ -1,0 +1,7 @@
+version: "2.1"
+services:
+    sso-build-prod:
+        extends:
+            file: docker-compose.base.yml
+            service: php
+        image: azko-upsell/crm-sso

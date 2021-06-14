@@ -2,7 +2,7 @@ variables:
   phpVersion: 7.4
   COMPOSER_CACHE_DIR: $(Pipeline.Workspace)/.composer
   SYMFONY_VENDOR_DIR: $(Build.SourcesDirectory)/vendor
-#  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isProduction: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
   hasDeploy: $[or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/develop') )]
 
 
@@ -10,12 +10,13 @@ trigger:
   branches:
     include:
     - develop
-    - releases/*
+    - release/*
     - feature/*
   tags:
     include:
     - '*'
-    
+pr: none
+   
 pool:
   vmImage: ubuntu-latest
      
@@ -59,9 +60,15 @@ stages:
         displayName: Cache vendors
           
       - script: composer install --no-interaction --prefer-dist --no-scripts
+        condition: eq(variables.isProduction, false)
         displayName: 'composer install'
         
+      - script: composer install --no-interaction --prefer-dist --no-scripts --no-dev --optimize-autoloader
+        condition: eq(variables.isProduction, true )
+        displayName: 'composer install production'
+        
 - stage: QA
+  condition: eq(variables.isProduction, false)
   jobs:
   - job: PhpUnit
     pool:
@@ -117,8 +124,7 @@ stages:
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: build/phpunit/coverage-cobertura.xml
-        reportDirectory: build/phpunit/coverage
-        pathToSources: src/
+        publishRunAttachments: true
       
   - job: Phpmd
     container: jakzal/phpqa:php$(phpVersion)
@@ -228,8 +234,7 @@ stages:
         inputs:
           PathtoPublish: build/phpcs
           artifactName: PhpcsReport
-      
-      
+           
   - job: Php_cs_fixer
     container: jakzal/phpqa:php$(phpVersion)
     steps:
@@ -266,7 +271,6 @@ stages:
           PathtoPublish: build/php-cs-fixer
           artifactName: Php-cs-fixerReport
       
-    
   - job: localPhpSecurityChecker
     container: jakzal/phpqa:php$(phpVersion)
     steps:
@@ -346,6 +350,7 @@ stages:
   
   
   - job: ZipPackage
+    condition: eq(variables.isProduction, false)
     steps:
     - task: Cache@2
       inputs:
@@ -357,57 +362,75 @@ stages:
         path: $(SYMFONY_VENDOR_DIR)
       displayName: Cache vendors
     
-    - script: ls -la $(build.artifactstagingdirectory)
-      displayName: show artifactstagingdirectory
-      
-    - script: echo $(build.artifactstagingdirectory)
-      displayName: echo artifactstagingdirectory
-      
-    
-      
-    - script: ls -la $(System.DefaultWorkingDirectory)
-      displayName: show DefaultWorkingDirectory
-      
-      
-    - script: echo $(build.Repository.Name)
-      displayName: show repository name
-      
     - task: ArchiveFiles@1
       displayName: Archive files
       inputs:
         rootFolder: $(System.DefaultWorkingDirectory)
         includeRootFolder: false
         archiveType: default
-        archiveFile: $(build.artifactstagingdirectory)/demo-build.zip
+        archiveFile: $(build.artifactstagingdirectory)/CRM-SSO-build.zip
         replaceExistingArchive: true
         
-    - script: ls -la $(build.artifactstagingdirectory)
-      displayName: show artifactstagingdirectory
-      
-      
     - task: PublishBuildArtifacts@1
       displayName: Publish Artifact
       inputs:
         PathtoPublish: $(build.artifactstagingdirectory)
-        artifactName: demo-build
-  
+        artifactName: project-build
       
   - job: DockerPackage
+#    condition: eq(variables.isProduction, true)
     steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
+        - task: Cache@2
+          inputs:
+            key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+            restoreKeys: |
+              vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+              vendor | "$(Agent.OS)"
+              vendor
+            path: $(SYMFONY_VENDOR_DIR)
+          displayName: Cache vendors
 
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
+        - task: DockerCompose@0
+          inputs:
+            containerregistrytype: 'Container Registry'
+            dockerRegistryEndpoint: 'scaleway container registry'
+            dockerComposeFile: 'docker-compose.production.yml'
+            action: 'Build services'
+            includeSourceTags: true
+            includeLatestTag: true
+
+- stage: Package_test
+  dependsOn: QA
+#  condition: and(succeeded(), eq(variables.hasDeploy, true))
+  jobs:
+  - job: DockerPackage
+#    condition: eq(variables.isProduction, true)
+    steps:
+        - task: Cache@2
+          inputs:
+            key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
+            restoreKeys: |
+              vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
+              vendor | "$(Agent.OS)"
+              vendor
+            path: $(SYMFONY_VENDOR_DIR)
+          displayName: Cache vendors
+
+        - task: DockerCompose@0
+          inputs:
+            containerregistrytype: 'Container Registry'
+            dockerRegistryEndpoint: 'scaleway container registry'
+            dockerComposeFile: 'docker-compose.production.yml'
+            action: 'Build services'
+            includeSourceTags: true
+            includeLatestTag: true
       
-  - job: HelmPackage
-    steps:
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
-
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
+#  - job: HelmPackage
+#    steps:
+#    - script: echo Hello, world!
+#      displayName: 'Run a one-line script'
+#
+#    - script: |
+#        echo Add other tasks to build, test, and deploy your project.
+#        echo See https://aka.ms/yaml
+#      displayName: 'Run a multi-line script'
