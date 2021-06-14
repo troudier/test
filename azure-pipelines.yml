@@ -344,6 +344,7 @@ stages:
           artifactName: phpcpdReport
 
 - stage: Package
+  dependsOn: [ 'Prepare', 'QA' ]
   condition: and(succeeded(), eq(variables.hasDeploy, true))
   jobs:
   
