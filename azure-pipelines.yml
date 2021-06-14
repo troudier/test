@@ -344,7 +344,6 @@ stages:
           artifactName: phpcpdReport
 
 - stage: Package
-  dependsOn: QA
   condition: and(succeeded(), eq(variables.hasDeploy, true))
   jobs:
   
@@ -391,6 +390,7 @@ stages:
           displayName: Cache vendors
 
         - task: DockerCompose@0
+          condition: eq(variables.isProduction, true)
           inputs:
             containerregistrytype: 'Container Registry'
             dockerRegistryEndpoint: 'scaleway container registry'
@@ -399,31 +399,6 @@ stages:
             includeSourceTags: true
             includeLatestTag: true
 
-- stage: Package_test
-  dependsOn: QA
-#  condition: and(succeeded(), eq(variables.hasDeploy, true))
-  jobs:
-  - job: DockerPackage
-#    condition: eq(variables.isProduction, true)
-    steps:
-        - task: Cache@2
-          inputs:
-            key: 'vendor | "$(Agent.OS)" | "$(Build.SourceBranch)" | composer.lock'
-            restoreKeys: |
-              vendor | "$(Agent.OS)" | "$(Build.SourceBranch)"
-              vendor | "$(Agent.OS)"
-              vendor
-            path: $(SYMFONY_VENDOR_DIR)
-          displayName: Cache vendors
-
-        - task: DockerCompose@0
-          inputs:
-            containerregistrytype: 'Container Registry'
-            dockerRegistryEndpoint: 'scaleway container registry'
-            dockerComposeFile: 'docker-compose.production.yml'
-            action: 'Build services'
-            includeSourceTags: true
-            includeLatestTag: true
       
 #  - job: HelmPackage
 #    steps:
