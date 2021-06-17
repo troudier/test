@@ -19,6 +19,9 @@ COPY . /var/www
 
 RUN mkdir -p /var/www/var/cache /var/www/var/log && chmod 777 -R /var/www/var/cache /var/www/var/log
 
-RUN mv /var/www/docker/vhosts/vhosts.conf /etc/apache2/sites-enabled/site.conf
+RUN mv /var/www/docker/vhosts/vhosts.conf /etc/apache2/sites-enabled/site.conf \
+    && rm -Rf /var/www/docker* \
+        .php* \
+        composer*
 
 WORKDIR /var/www/
